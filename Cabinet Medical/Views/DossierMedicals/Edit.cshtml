@@ -1,0 +1,51 @@
+@model Cabinet_Medical.Models.DossierMedical
+
+@{
+    ViewData["Title"] = "Modifier un Dossier Médical";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i>Modifier un Dossier Médical
+        </h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="PatientId" />
+            <input type="hidden" asp-for="DateCreation" />
+
+            <div class="mb-3">
+                <label class="form-label">Patient</label>
+                <input class="form-control" value="@Model.Patient?.Nom @Model.Patient?.Prenom" disabled />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Date de création</label>
+                <input class="form-control" value="@Model.DateCreation.ToString("dd/MM/yyyy")" disabled />
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Remarques" class="form-label">Remarques</label>
+                <textarea asp-for="Remarques" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Remarques" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Enregistrer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

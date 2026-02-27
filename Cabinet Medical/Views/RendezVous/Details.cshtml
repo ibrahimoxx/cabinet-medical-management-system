@@ -1,0 +1,69 @@
+@model Cabinet_Medical.Models.RendezVous
+
+@{
+    ViewData["Title"] = "Détails du Rendez-vous";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-calendar-event me-2"></i>Détails du Rendez-vous
+        </h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9"><strong>@Model.DateRdv.ToString("dd/MM/yyyy")</strong></dd>
+
+            <dt class="col-sm-3">Heure</dt>
+            <dd class="col-sm-9">@Model.HeureRdv.ToString(@"hh\:mm")</dd>
+
+            <dt class="col-sm-3">Patient</dt>
+            <dd class="col-sm-9"><strong>@Model.Patient?.Nom @Model.Patient?.Prenom</strong></dd>
+
+            <dt class="col-sm-3">Médecin</dt>
+            <dd class="col-sm-9">Dr. @Model.Medecin?.Nom @Model.Medecin?.Prenom (@Model.Medecin?.Specialite)</dd>
+
+            <dt class="col-sm-3">Motif</dt>
+            <dd class="col-sm-9">@(Model.Motif ?? "N/A")</dd>
+
+            <dt class="col-sm-3">Statut</dt>
+            <dd class="col-sm-9">
+                @if (Model.Statut == "Planifie")
+                {
+                    <span class="badge badge-info">Planifié</span>
+                }
+                else if (Model.Statut == "Termine")
+                {
+                    <span class="badge badge-success">Terminé</span>
+                }
+                else if (Model.Statut == "Annule")
+                {
+                    <span class="badge badge-danger">Annulé</span>
+                }
+            </dd>
+        </dl>
+
+        <div class="mt-4">
+            @if (Context.Session.GetString("UserRole") == "Secretaire")
+            {
+                <!-- EXTEND: Modifier rendez-vous (Secrétaire) -->
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil me-2"></i>Modifier
+                </a>
+                <!-- EXTEND: Annuler rendez-vous (Secrétaire) -->
+                @if (Model.Statut == "Planifie")
+                {
+                    <a asp-action="Annuler" asp-route-id="@Model.Id" class="btn btn-danger"
+                       onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?');">
+                        <i class="bi bi-x-circle me-2"></i>Annuler
+                    </a>
+                }
+            }
+            <a asp-action="Index" asp-controller="Dashboard" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Retour
+            </a>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stats-card primary fade-in">
+            <div class="icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <h3>@ViewBag.TotalUsers</h3>
+            <p>Total Utilisateurs</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card success fade-in">
+            <div class="icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h3>@ViewBag.ActiveUsers</h3>
+            <p>Utilisateurs Actifs</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card warning fade-in">
+            <div class="icon">
+                <i class="bi bi-person-heart"></i>
+            </div>
+            <h3>@ViewBag.TotalPatients</h3>
+            <p>Patients</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stats-card danger fade-in">
+            <div class="icon">
+                <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+            <h3>@ViewBag.TotalMedecins</h3>
+            <p>Médecins</p>
+        </div>
+    </div>
+</div>
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-gear-fill me-2"></i>Administration
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="feature-card primary fade-in" onclick="window.location.href='@Url.Action("Index", "Users")'">
+                    <div class="feature-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h5>Gestion des Utilisateurs</h5>
+                    <p class="text-muted">Consulter, ajouter, modifier et supprimer des utilisateurs</p>
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary mt-3">
+                        <i class="bi bi-arrow-right me-2"></i>Accéder
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="feature-card info fade-in" onclick="window.location.href='@Url.Action("Index", "Profile")'">
+                    <div class="feature-icon">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h5>Mon Profil</h5>
+                    <p class="text-muted">Modifier vos informations personnelles</p>
+                    <a asp-controller="Profile" asp-action="Index" class="btn btn-info mt-3">
+                        <i class="bi bi-arrow-right me-2"></i>Accéder
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-shadow:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+        transform: translateY(-4px);
+    }
+</style>

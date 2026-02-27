@@ -1,0 +1,78 @@
+@model Cabinet_Medical.Models.Facture
+
+@{
+    ViewData["Title"] = "Payer une Facture";
+}
+
+@{
+    var montantPaye = Model.Paiements?.Sum(p => p.Montant) ?? 0;
+    var montantRestant = Model.Montant - montantPaye;
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-credit-card me-2"></i>Payer la Facture #@Model.Id
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-info mb-4">
+            <h5>Détails de la facture</h5>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Montant total</dt>
+                <dd class="col-sm-9"><strong>@Model.Montant.ToString("C")</strong></dd>
+
+                <dt class="col-sm-3">Déjà payé</dt>
+                <dd class="col-sm-9">@montantPaye.ToString("C")</dd>
+
+                <dt class="col-sm-3">Reste à payer</dt>
+                <dd class="col-sm-9"><strong class="text-success">@montantRestant.ToString("C")</strong></dd>
+            </dl>
+        </div>
+
+        <form asp-action="Payer" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="factureId" value="@Model.Id" />
+
+            <div class="mb-4">
+                <label for="modePaiement" class="form-label">Mode de paiement <span class="text-danger">*</span></label>
+                <select name="modePaiement" id="modePaiement" class="form-select" required>
+                    <option value="">-- Sélectionner un mode de paiement --</option>
+                    <!-- EXTEND: Payer facture <<extend>> Espèces -->
+                    <option value="Espece">Espèces</option>
+                    <!-- EXTEND: Payer facture <<extend>> En ligne -->
+                    <option value="EnLigne">En ligne (Paiement sécurisé)</option>
+                </select>
+                <small class="text-muted">Le paiement en ligne redirigera vers une page sécurisée.</small>
+            </div>
+
+            <div class="alert alert-warning" id="enLigneInfo" style="display: none;">
+                <i class="bi bi-info-circle me-2"></i>
+                Le paiement en ligne nécessitera une redirection vers un système de paiement sécurisé.
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Payer @montantRestant.ToString("C")
+                </button>
+                <a asp-action="MesFactures" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('modePaiement').addEventListener('change', function() {
+            const enLigneInfo = document.getElementById('enLigneInfo');
+            if (this.value === 'EnLigne') {
+                enLigneInfo.style.display = 'block';
+            } else {
+                enLigneInfo.style.display = 'none';
+            }
+        });
+    </script>
+}
+

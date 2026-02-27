@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Médecin Dashboard";
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stats-card primary fade-in">
+            <div class="icon">
+                <i class="bi bi-calendar-event-fill"></i>
+            </div>
+            <h3>@ViewBag.MesRDVAujourdhui</h3>
+            <p>RDV Aujourd'hui</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card success fade-in">
+            <div class="icon">
+                <i class="bi bi-clipboard2-pulse-fill"></i>
+            </div>
+            <h3>@ViewBag.MesConsultations</h3>
+            <p>Consultations</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card warning fade-in">
+            <div class="icon">
+                <i class="bi bi-prescription2"></i>
+            </div>
+            <h3>@ViewBag.MesOrdonnances</h3>
+            <p>Ordonnances</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="feature-card primary fade-in" onclick="window.location.href='@Url.Action("MesRendezVous", "RendezVous")'">
+            <div class="feature-icon">
+                <i class="bi bi-calendar-check-fill"></i>
+            </div>
+            <h5>Mes Rendez-vous</h5>
+            <p class="text-muted">Consulter vos rendez-vous planifiés</p>
+            <a asp-controller="RendezVous" asp-action="MesRendezVous" class="btn btn-primary mt-3">
+                <i class="bi bi-arrow-right me-2"></i>Accéder
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="feature-card success fade-in" onclick="window.location.href='@Url.Action("Index", "Consultations")'">
+            <div class="feature-icon">
+                <i class="bi bi-clipboard2-pulse-fill"></i>
+            </div>
+            <h5>Consultations</h5>
+            <p class="text-muted">Créer et gérer les consultations</p>
+            <a asp-controller="Consultations" asp-action="Index" class="btn btn-success mt-3">
+                <i class="bi bi-arrow-right me-2"></i>Accéder
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="feature-card warning fade-in" onclick="window.location.href='@Url.Action("Index", "Ordonnances")'">
+            <div class="feature-icon">
+                <i class="bi bi-prescription2"></i>
+            </div>
+            <h5>Ordonnances</h5>
+            <p class="text-muted">Créer et gérer les ordonnances</p>
+            <a asp-controller="Ordonnances" asp-action="Index" class="btn btn-warning mt-3">
+                <i class="bi bi-arrow-right me-2"></i>Accéder
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="feature-card info fade-in" onclick="window.location.href='@Url.Action("Index", "DossierMedicals")'">
+            <div class="feature-icon">
+                <i class="bi bi-file-earmark-medical"></i>
+            </div>
+            <h5>Dossiers Médicaux</h5>
+            <p class="text-muted">Consulter les dossiers médicaux des patients</p>
+            <a asp-controller="DossierMedicals" asp-action="Index" class="btn btn-info mt-3">
+                <i class="bi bi-arrow-right me-2"></i>Accéder
+            </a>
+        </div>
+    </div>
+</div>

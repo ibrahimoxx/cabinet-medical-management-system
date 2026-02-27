@@ -1,0 +1,102 @@
+@model Cabinet_Medical.Models.DossierMedical
+
+@{
+    ViewData["Title"] = "Consulter un Dossier Médical";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-file-earmark-medical me-2"></i>Dossier Médical - @Model.Patient?.Nom @Model.Patient?.Prenom
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Informations du Patient</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Nom</dt>
+                    <dd class="col-sm-8"><strong>@Model.Patient?.Nom @Model.Patient?.Prenom</strong></dd>
+
+                    <dt class="col-sm-4">Date de naissance</dt>
+                    <dd class="col-sm-8">@(Model.Patient?.DateNaissance?.ToString("dd/MM/yyyy") ?? "N/A")</dd>
+
+                    <dt class="col-sm-4">Téléphone</dt>
+                    <dd class="col-sm-8">@(Model.Patient?.Telephone ?? "N/A")</dd>
+
+                    <dt class="col-sm-4">Adresse</dt>
+                    <dd class="col-sm-8">@(Model.Patient?.Adresse ?? "N/A")</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h5>Dossier Médical</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Date de création</dt>
+                    <dd class="col-sm-8">@Model.DateCreation.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Remarques</dt>
+                    <dd class="col-sm-8">@(Model.Remarques ?? "Aucune")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">Historique des Consultations</h5>
+        @if (ViewBag.Consultations != null && ((List<Cabinet_Medical.Models.Consultation>)ViewBag.Consultations).Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Médecin</th>
+                            <th>Diagnostic</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var consultation in (List<Cabinet_Medical.Models.Consultation>)ViewBag.Consultations)
+                        {
+                            <tr>
+                                <td>@consultation.DateConsultation.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>Dr. @consultation.Medecin?.Nom @consultation.Medecin?.Prenom</td>
+                                <td>@(consultation.Diagnostic ?? "N/A")</td>
+                                <td>
+                                    <a asp-controller="Consultations" asp-action="Details" asp-route-id="@consultation.Id" class="btn btn-sm btn-info" title="Détails consultation">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    @if (Context.Session.GetString("UserRole") == "Medecin")
+                                    {
+                                        <!-- EXTEND: Ajouter ordonnance depuis consultation (dans dossier médical) -->
+                                        <a asp-controller="Ordonnances" asp-action="Create" asp-route-consultationId="@consultation.Id" class="btn btn-sm btn-success" title="Créer ordonnance">
+                                            <i class="bi bi-prescription2"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Aucune consultation enregistrée.</p>
+            @if (Context.Session.GetString("UserRole") == "Medecin")
+            {
+                <!-- INCLUDE: Ajouter consultation (obligatoire pour créer ordonnance) -->
+                <a asp-controller="Consultations" asp-action="Create" asp-route-dossierMedicalId="@Model.Id" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Créer une consultation
+                </a>
+            }
+        }
+
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+

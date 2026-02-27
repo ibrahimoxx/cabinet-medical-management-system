@@ -1,0 +1,200 @@
+@model Cabinet_Medical.Models.Ordonnance
+
+@{
+    ViewData["Title"] = "Modifier une Ordonnance";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i>Modifier une Ordonnance
+        </h4>
+    </div>
+    <div class="card-body">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show fade-in" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div id="ordonnanceDetails">
+                @if (Model.OrdonnanceDetails != null && Model.OrdonnanceDetails.Any())
+                {
+                    @foreach (var detail in Model.OrdonnanceDetails)
+                    {
+                        <div class="detail-row mb-3 p-3 border rounded">
+                            <input type="hidden" name="detailIds" value="@detail.Id" />
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label">Type <span class="text-danger">*</span></label>
+                                    <select name="types" class="form-select" required>
+                                        @if (detail.Type == "Medicament")
+                                        {
+                                            <option value="Medicament" selected>Médicament</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="Medicament">Médicament</option>
+                                        }
+                                        @if (detail.Type == "Analyse")
+                                        {
+                                            <option value="Analyse" selected>Analyse</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="Analyse">Analyse</option>
+                                        }
+                                        @if (detail.Type == "Radiologie")
+                                        {
+                                            <option value="Radiologie" selected>Radiologie</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="Radiologie">Radiologie</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label">Description <span class="text-danger">*</span></label>
+                                    <input type="text" name="descriptions" class="form-control" required value="@(detail.Description ?? "")" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Dosage</label>
+                                    <input type="text" name="dosages" class="form-control" value="@(detail.Dosage ?? "")" />
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="detail-row mb-3 p-3 border rounded">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Type <span class="text-danger">*</span></label>
+                                <select name="types" class="form-select" required>
+                                    <option value="Medicament">Médicament</option>
+                                    <option value="Analyse">Analyse</option>
+                                    <option value="Radiologie">Radiologie</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Description <span class="text-danger">*</span></label>
+                                <input type="text" name="descriptions" class="form-control" required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Dosage</label>
+                                <input type="text" name="dosages" class="form-control" />
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="button" class="btn btn-danger btn-sm remove-row">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="mb-4">
+                <button type="button" class="btn btn-secondary" id="addRow">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter un élément
+                </button>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Enregistrer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('addRow').addEventListener('click', function() {
+            const container = document.getElementById('ordonnanceDetails');
+            const firstRow = container.querySelector('.detail-row');
+            if (!firstRow) return;
+            
+            const newRow = firstRow.cloneNode(true);
+            
+            // Remove hidden input for detailIds (only for new rows)
+            const hiddenInput = newRow.querySelector('input[type="hidden"][name="detailIds"]');
+            if (hiddenInput) {
+                hiddenInput.remove();
+            }
+            
+            // Reset values
+            newRow.querySelectorAll('input[type="text"]').forEach(input => {
+                input.value = '';
+            });
+            
+            newRow.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            container.appendChild(newRow);
+        });
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-row')) {
+                const rows = document.querySelectorAll('.detail-row');
+                if (rows.length > 1) {
+                    e.target.closest('.detail-row').remove();
+                } else {
+                    alert('Au moins un élément est requis.');
+                }
+            }
+        });
+
+        // Validation avant soumission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const types = document.querySelectorAll('select[name="types"]');
+            const descriptions = document.querySelectorAll('input[name="descriptions"]');
+            let hasError = false;
+
+            for (let i = 0; i < types.length; i++) {
+                if (types[i].value.trim() === '' || descriptions[i].value.trim() === '') {
+                    hasError = true;
+                    break;
+                }
+            }
+
+            if (hasError || types.length === 0) {
+                e.preventDefault();
+                alert('Veuillez remplir tous les champs obligatoires (Type et Description) pour chaque élément.');
+                return false;
+            }
+        });
+    </script>
+}
+

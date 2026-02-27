@@ -1,0 +1,120 @@
+@model Cabinet_Medical.Models.Consultation
+
+@{
+    ViewData["Title"] = "Nouvelle Consultation";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-clipboard2-plus me-2"></i>Nouvelle Consultation
+        </h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Create" method="post" novalidate>
+            @Html.AntiForgeryToken()
+            @if (ViewBag.MedecinId != null)
+            {
+                <input type="hidden" name="MedecinId" id="MedecinId" value="@ViewBag.MedecinId" />
+            }
+
+            <div class="mb-3">
+                <label for="DossierMedicalId" class="form-label">Dossier Médical (Patient) <span class="text-danger">*</span></label>
+                <select name="DossierMedicalId" id="DossierMedicalId" class="form-select">
+                    <option value="">-- Sélectionner un dossier médical --</option>
+                    @if (ViewBag.DossierMedicals != null)
+                    {
+                        @foreach (var dossier in ViewBag.DossierMedicals as IEnumerable<Cabinet_Medical.Models.DossierMedical>)
+                        {
+                            var isSelected = Model != null && dossier.Id == Model.DossierMedicalId;
+                            <option value="@dossier.Id" selected="@isSelected">
+                                @dossier.Patient?.Nom @dossier.Patient?.Prenom - Créé le @dossier.DateCreation.ToString("dd/MM/yyyy")
+                            </option>
+                        }
+                    }
+                </select>
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState["DossierMedicalId"]?.Errors?.Count > 0)
+                {
+                    @foreach (var error in ViewData.ModelState["DossierMedicalId"]?.Errors)
+                    {
+                        <span class="text-danger d-block">@error.ErrorMessage</span>
+                    }
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="DateConsultation" class="form-label">Date de consultation <span class="text-danger">*</span></label>
+                <input name="DateConsultation" id="DateConsultation" type="datetime-local" class="form-control" 
+                       value="@(Model?.DateConsultation != default ? Model.DateConsultation.ToString("yyyy-MM-ddTHH:mm") : DateTime.Now.ToString("yyyy-MM-ddTHH:mm"))" />
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState["DateConsultation"]?.Errors?.Count > 0)
+                {
+                    @foreach (var error in ViewData.ModelState["DateConsultation"]?.Errors)
+                    {
+                        <span class="text-danger d-block">@error.ErrorMessage</span>
+                    }
+                }
+            </div>
+
+            <div class="mb-3">
+                <label for="Diagnostic" class="form-label">Diagnostic</label>
+                <textarea name="Diagnostic" id="Diagnostic" class="form-control" rows="4">@(Model?.Diagnostic ?? "")</textarea>
+            </div>
+
+            <div class="mb-4">
+                <label for="Notes" class="form-label">Notes</label>
+                <textarea name="Notes" id="Notes" class="form-control" rows="4">@(Model?.Notes ?? "")</textarea>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <h6>Erreurs de validation :</h6>
+                    <ul class="mb-0">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Créer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    var dossierMedicalId = document.getElementById('DossierMedicalId').value;
+                    var dateConsultation = document.getElementById('DateConsultation').value;
+                    
+                    if (!dossierMedicalId || dossierMedicalId === '') {
+                        e.preventDefault();
+                        alert('Veuillez sélectionner un dossier médical.');
+                        return false;
+                    }
+                    
+                    if (!dateConsultation) {
+                        e.preventDefault();
+                        alert('Veuillez sélectionner une date de consultation.');
+                        return false;
+                    }
+                    
+                    return true;
+                });
+            }
+        });
+    </script>
+}
+

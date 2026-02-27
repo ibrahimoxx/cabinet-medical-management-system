@@ -1,0 +1,129 @@
+@model Cabinet_Medical.Models.Facture
+
+@{
+    ViewData["Title"] = "Détails de la Facture";
+    var montantPaye = Model.Paiements?.Sum(p => p.Montant) ?? 0;
+    var reste = Model.Montant - montantPaye;
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-receipt me-2"></i>Facture #@Model.Id
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Informations Facture</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">N° Facture</dt>
+                    <dd class="col-sm-8"><strong>#@Model.Id</strong></dd>
+
+                    <dt class="col-sm-4">Date</dt>
+                    <dd class="col-sm-8">@Model.DateFacture.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Montant total</dt>
+                    <dd class="col-sm-8"><strong>@Model.Montant.ToString("C")</strong></dd>
+
+                    <dt class="col-sm-4">Statut</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Statut == "Payee" || reste <= 0)
+                        {
+                            <span class="badge badge-success">Payée</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-danger">Non payée</span>
+                        }
+                    </dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h5>Informations Patient</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Patient</dt>
+                    <dd class="col-sm-8"><strong>@Model.Patient?.Nom @Model.Patient?.Prenom</strong></dd>
+
+                    <dt class="col-sm-4">Consultation</dt>
+                    <dd class="col-sm-8">@Model.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-4">Médecin</dt>
+                    <dd class="col-sm-8">Dr. @Model.Consultation?.Medecin?.Nom @Model.Consultation?.Medecin?.Prenom</dd>
+                </dl>
+            </div>
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">Historique des Paiements</h5>
+        @if (Model.Paiements != null && Model.Paiements.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Mode de paiement</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var paiement in Model.Paiements)
+                        {
+                            <tr>
+                                <td>@paiement.DatePaiement.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (paiement.ModePaiement == "EnLigne")
+                                    {
+                                        <span class="badge badge-info">En ligne</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-warning">Espèces</span>
+                                    }
+                                </td>
+                                <td><strong>@paiement.Montant.ToString("C")</strong></td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">Total payé</th>
+                            <th>@montantPaye.ToString("C")</th>
+                        </tr>
+                        @if (reste > 0)
+                        {
+                            <tr>
+                                <th colspan="2">Reste à payer</th>
+                                <th class="text-danger">@reste.ToString("C")</th>
+                            </tr>
+                        }
+                    </tfoot>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Aucun paiement enregistré.</p>
+        }
+
+        <div class="mt-4">
+            @if (Context.Session.GetString("UserRole") == "Patient" && reste > 0)
+            {
+                <!-- EXTEND: Payer facture -->
+                <a asp-action="Payer" asp-route-id="@Model.Id" class="btn btn-success">
+                    <i class="bi bi-credit-card me-2"></i>Payer la facture
+                </a>
+            }
+            <!-- EXTEND: Imprimer facture -->
+            <a asp-action="Imprimer" asp-route-id="@Model.Id" class="btn btn-secondary" target="_blank">
+                <i class="bi bi-printer me-2"></i>Imprimer
+            </a>
+            <a asp-action="@(Context.Session.GetString("UserRole") == "Patient" ? "MesFactures" : "Index")" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Retour
+            </a>
+        </div>
+    </div>
+</div>
+

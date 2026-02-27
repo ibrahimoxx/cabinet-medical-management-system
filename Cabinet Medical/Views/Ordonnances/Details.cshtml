@@ -1,0 +1,115 @@
+@model Cabinet_Medical.Models.Ordonnance
+
+@{
+    ViewData["Title"] = "Détails de l'Ordonnance";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-prescription2 me-2"></i>Détails de l'Ordonnance
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Informations</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Date</dt>
+                    <dd class="col-sm-8"><strong>@Model.DateOrdonnance.ToString("dd/MM/yyyy")</strong></dd>
+
+                    <dt class="col-sm-4">Patient</dt>
+                    <dd class="col-sm-8">@Model.Consultation?.DossierMedical?.Patient?.Nom @Model.Consultation?.DossierMedical?.Patient?.Prenom</dd>
+
+                    <dt class="col-sm-4">Médecin</dt>
+                    <dd class="col-sm-8">Dr. @Model.Consultation?.Medecin?.Nom @Model.Consultation?.Medecin?.Prenom</dd>
+
+                    <dt class="col-sm-4">Consultation</dt>
+                    <dd class="col-sm-8">@Model.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</dd>
+                </dl>
+            </div>
+        </div>
+
+        <hr />
+
+        <h5 class="mb-3">Détails de l'ordonnance</h5>
+        @if (Model.OrdonnanceDetails != null && Model.OrdonnanceDetails.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Dosage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Model.OrdonnanceDetails)
+                        {
+                            <tr>
+                                <td>
+                                    @if (detail.Type == "Medicament")
+                                    {
+                                        <span class="badge bg-info">MÉDICAMENT</span>
+                                    }
+                                    else if (detail.Type == "Analyse")
+                                    {
+                                        <span class="badge bg-warning">ANALYSE</span>
+                                    }
+                                    else if (detail.Type == "Radiologie")
+                                    {
+                                        <span class="badge bg-success">RADIOLOGIE</span>
+                                    }
+                                </td>
+                                <td><strong>@detail.Description</strong></td>
+                                <td>@(detail.Dosage ?? "N/A")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Aucun détail disponible.</p>
+        }
+
+        <div class="mt-4">
+            @{
+                var userRole = Context.Session.GetString("UserRole");
+            }
+            @if (userRole == "Medecin")
+            {
+                <!-- EXTEND: Modifier ordonnance -->
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil me-2"></i>Modifier
+                </a>
+                <!-- EXTEND: Imprimer ordonnance -->
+                <a asp-action="Imprimer" asp-route-id="@Model.Id" class="btn btn-secondary" target="_blank">
+                    <i class="bi bi-printer me-2"></i>Imprimer
+                </a>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Retour
+                </a>
+            }
+            else if (userRole == "Secretaire")
+            {
+                <!-- EXTEND: Imprimer ordonnance (Secretaire) -->
+                <a asp-action="Imprimer" asp-route-id="@Model.Id" class="btn btn-secondary" target="_blank">
+                    <i class="bi bi-printer me-2"></i>Imprimer
+                </a>
+                <a asp-controller="Consultations" asp-action="Details" asp-route-id="@Model.ConsultationId" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Retour à la consultation
+                </a>
+            }
+            else if (userRole == "Patient")
+            {
+                <a asp-action="MesOrdonnances" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Retour
+                </a>
+            }
+        </div>
+    </div>
+</div>
+

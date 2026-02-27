@@ -1,0 +1,97 @@
+@model Cabinet_Medical.Models.Consultation
+
+@{
+    ViewData["Title"] = "Détails de la Consultation";
+    var role = Context.Session.GetString("UserRole");
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-clipboard2-pulse me-2"></i>Détails de la Consultation
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Informations Patient</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Patient</dt>
+                    <dd class="col-sm-8"><strong>@Model.DossierMedical?.Patient?.Nom @Model.DossierMedical?.Patient?.Prenom</strong></dd>
+
+                    <dt class="col-sm-4">Date de consultation</dt>
+                    <dd class="col-sm-8">@Model.DateConsultation.ToString("dd/MM/yyyy à HH:mm")</dd>
+
+                    <dt class="col-sm-4">Médecin</dt>
+                    <dd class="col-sm-8">Dr. @Model.Medecin?.Nom @Model.Medecin?.Prenom (@Model.Medecin?.Specialite)</dd>
+                </dl>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+            <h5>Diagnostic</h5>
+            <p class="p-3 bg-light rounded">@(Model.Diagnostic ?? "Aucun diagnostic")</p>
+        </div>
+
+        <div class="mb-4">
+            <h5>Notes</h5>
+            <p class="p-3 bg-light rounded">@(Model.Notes ?? "Aucune note")</p>
+        </div>
+
+        @if (ViewBag.Ordonnances != null && ((List<Cabinet_Medical.Models.Ordonnance>)ViewBag.Ordonnances).Any())
+        {
+            <div class="mb-4">
+                <h5>Ordonnances associées</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Détails</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ordonnance in (List<Cabinet_Medical.Models.Ordonnance>)ViewBag.Ordonnances)
+                            {
+                                <tr>
+                                    <td>@ordonnance.DateOrdonnance.ToString("dd/MM/yyyy")</td>
+                                    <td>@ordonnance.OrdonnanceDetails?.Count() élément(s)</td>
+                                    <td>
+                                        <a asp-controller="Ordonnances" asp-action="Details" asp-route-id="@ordonnance.Id" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <div class="d-flex gap-2">
+            @if (role == "Medecin")
+            {
+                <!-- EXTEND: Modifier consultation -->
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                    <i class="bi bi-pencil me-2"></i>Modifier
+                </a>
+                <!-- EXTEND: Imprimer consultation -->
+                <a asp-action="Imprimer" asp-route-id="@Model.Id" class="btn btn-secondary" target="_blank">
+                    <i class="bi bi-printer me-2"></i>Imprimer
+                </a>
+                <!-- EXTEND: Créer ordonnance depuis consultation -->
+                <a asp-controller="Ordonnances" asp-action="Create" asp-route-consultationId="@Model.Id" class="btn btn-success">
+                    <i class="bi bi-prescription2 me-2"></i>Créer une ordonnance
+                </a>
+            }
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Retour
+            </a>
+        </div>
+    </div>
+</div>
+

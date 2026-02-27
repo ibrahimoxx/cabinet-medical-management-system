@@ -1,0 +1,154 @@
+@model Cabinet_Medical.Models.DossierMedical
+
+@{
+    ViewData["Title"] = "Créer un Dossier Médical";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-file-earmark-plus me-2"></i>Créer un Dossier Médical
+        </h4>
+    </div>
+    <div class="card-body">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        
+        <form asp-action="Create" method="post" id="createDossierForm" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label for="PatientId" class="form-label">Patient <span class="text-danger">*</span></label>
+                @if (ViewBag.PatientId != null)
+                {
+                    <input type="text" class="form-control" value="@ViewBag.PatientName" readonly />
+                    <input type="hidden" name="PatientId" id="PatientId" value="@ViewBag.PatientId" />
+                    <small class="text-muted">Patient pré-sélectionné depuis la liste.</small>
+                }
+                else
+                {
+                    <select name="PatientId" id="PatientId" class="form-select">
+                        <option value="">-- Sélectionner un patient --</option>
+                        @if (ViewBag.Patients != null)
+                        {
+                            @foreach (var patient in ViewBag.Patients as IEnumerable<Cabinet_Medical.Models.Patient>)
+                            {
+                                var isSelected = Model != null && Model.PatientId == patient.Id;
+                                <option value="@patient.Id" selected="@isSelected">@patient.Nom @patient.Prenom (@patient.User?.Email)</option>
+                            }
+                        }
+                    </select>
+                    <small class="text-muted">Seuls les patients sans dossier médical sont affichés.</small>
+                }
+                @if (!ViewData.ModelState.IsValid && ViewData.ModelState["PatientId"]?.Errors?.Count > 0)
+                {
+                    @foreach (var error in ViewData.ModelState["PatientId"]?.Errors)
+                    {
+                        <span class="text-danger d-block">@error.ErrorMessage</span>
+                    }
+                }
+            </div>
+
+            <div class="mb-4">
+                <label for="Remarques" class="form-label">Remarques</label>
+                <textarea name="Remarques" id="Remarques" class="form-control" rows="4" placeholder="Ajouter des remarques (optionnel)">@(Model?.Remarques ?? "")</textarea>
+            </div>
+
+            @* Afficher les erreurs de validation générales *@
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    <h6>Erreurs de validation :</h6>
+                    <ul class="mb-0">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Créer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Désactiver complètement la validation unobtrusive pour ce formulaire
+        (function() {
+            // Attendre que tout soit chargé
+            window.addEventListener('load', function() {
+                var form = document.getElementById('createDossierForm');
+                if (form) {
+                    // Désactiver la validation unobtrusive jQuery si elle existe
+                    if (typeof jQuery !== 'undefined' && jQuery.validator) {
+                        jQuery.validator.unobtrusive.parse = function() { return this; };
+                        jQuery.validator.unobtrusive.adapters = [];
+                    }
+                    
+                    // Supprimer tous les attributs data-val immédiatement
+                    var allElements = form.querySelectorAll('[data-val]');
+                    allElements.forEach(function(el) {
+                        el.removeAttribute('data-val');
+                        el.removeAttribute('data-val-required');
+                        el.removeAttribute('data-val-number');
+                        el.removeAttribute('data-val-range');
+                    });
+                    
+                    // Supprimer aussi les spans de validation
+                    var validationSpans = form.querySelectorAll('span[data-valmsg-for]');
+                    validationSpans.forEach(function(span) {
+                        span.remove();
+                    });
+                    
+                    // Validation manuelle au submit
+                    form.addEventListener('submit', function(e) {
+                        var patientIdInput = form.querySelector('input[name="PatientId"]');
+                        var patientIdSelect = form.querySelector('select[name="PatientId"]');
+                        var patientId = null;
+                        var submitBtn = form.querySelector('button[type="submit"]');
+                        
+                        // Vérifier PatientId
+                        if (patientIdInput) {
+                            patientId = patientIdInput.value;
+                            console.log('PatientId from hidden input:', patientId);
+                        } else if (patientIdSelect) {
+                            patientId = patientIdSelect.value;
+                            console.log('PatientId from select:', patientId);
+                        }
+                        
+                        if (!patientId || patientId === '' || patientId === '0') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            alert('Veuillez sélectionner un patient.');
+                            return false;
+                        }
+                        
+                        // Désactiver le bouton pour éviter double soumission
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Création...';
+                        }
+                        
+                        console.log('Form submitting with PatientId:', patientId);
+                        return true;
+                    });
+                }
+            });
+        })();
+    </script>
+}
+

@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Cabinet Medical</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Animate -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <!-- Modern CSS -->
+    <link rel="stylesheet" href="~/css/modern.css?v=2.0" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+
+@* 🔐 GLOBAL SESSION PROTECTION (OPTION B) *@
+@if (Context.Session.GetString("UserRole") == null
+    && !Context.Request.Path.Value!.ToLower().Contains("/account/login"))
+{
+    <script>
+        window.location.href = '/Account/Login';
+    </script>
+}
+
+@if (Context.Session.GetString("Username") != null)
+{
+    <div class="sidebar animate__animated animate__fadeInLeft">
+        <h4 class="mb-4">🏥 Cabinet</h4>
+
+        <!-- DASHBOARD -->
+        <a asp-controller="Dashboard" asp-action="Index">
+            <i class="bi bi-house"></i> Dashboard
+        </a>
+
+        <!-- PROFILE (FOR ALL ROLES) -->
+        <a asp-controller="Profile" asp-action="Index">
+            <i class="bi bi-person-circle"></i> Mon profil
+        </a>
+
+        <!-- ALERTES (FOR ALL ROLES) -->
+        <a asp-controller="Alertes" asp-action="Index">
+            <i class="bi bi-bell"></i> Mes alertes
+        </a>
+
+        <!-- ADMIN -->
+        @if (Context.Session.GetString("UserRole") == "Admin")
+        {
+            <a asp-controller="Users" asp-action="Index">
+                <i class="bi bi-people"></i> Gestion Utilisateurs
+            </a>
+        }
+
+        <!-- SECRÉTAIRE -->
+        @if (Context.Session.GetString("UserRole") == "Secretaire")
+        {
+            <a asp-controller="Patients" asp-action="Index">
+                <i class="bi bi-people-fill"></i> Patients
+            </a>
+            <a asp-controller="RendezVous" asp-action="Index">
+                <i class="bi bi-calendar-check"></i> Rendez-vous
+            </a>
+            <a asp-controller="DossierMedicals" asp-action="Index">
+                <i class="bi bi-file-earmark-medical"></i> Dossiers médicaux
+            </a>
+            <a asp-controller="Factures" asp-action="Index">
+                <i class="bi bi-receipt"></i> Factures
+            </a>
+            <a asp-controller="Consultations" asp-action="Index">
+                <i class="bi bi-clipboard2-pulse"></i> Consultations
+            </a>
+        }
+
+        <!-- MÉDECIN -->
+        @if (Context.Session.GetString("UserRole") == "Medecin")
+        {
+            <a asp-controller="RendezVous" asp-action="MesRendezVous">
+                <i class="bi bi-calendar-check"></i> Mes rendez-vous
+            </a>
+            <a asp-controller="Consultations" asp-action="Index">
+                <i class="bi bi-clipboard2-pulse"></i> Consultations
+            </a>
+            <a asp-controller="Ordonnances" asp-action="Index">
+                <i class="bi bi-prescription2"></i> Ordonnances
+            </a>
+            <a asp-controller="DossierMedicals" asp-action="Index">
+                <i class="bi bi-file-earmark-medical"></i> Dossiers médicaux
+            </a>
+        }
+
+        <!-- PATIENT -->
+        @if (Context.Session.GetString("UserRole") == "Patient")
+        {
+            <a asp-controller="RendezVous" asp-action="Create">
+                <i class="bi bi-calendar-plus"></i> Prendre un rendez-vous
+            </a>
+            <a asp-controller="RendezVous" asp-action="MesRendezVous">
+                <i class="bi bi-calendar-check"></i> Mes rendez-vous
+            </a>
+            <a asp-controller="DossierMedicals" asp-action="MonDossier">
+                <i class="bi bi-file-earmark-medical"></i> Mon dossier médical
+            </a>
+            <a asp-controller="Factures" asp-action="MesFactures">
+                <i class="bi bi-receipt"></i> Mes factures
+            </a>
+            <a asp-controller="Ordonnances" asp-action="MesOrdonnances">
+                <i class="bi bi-prescription2"></i> Mes ordonnances
+            </a>
+        }
+
+        <hr />
+
+        <a asp-controller="Account" asp-action="Logout" style="color: #fbbf24;">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </a>
+    </div>
+}
+
+
+<!-- MAIN CONTENT -->
+<div class="content animate__animated animate__fadeIn">
+    <div class="topbar">
+        <h5>@ViewData["Title"]</h5>
+        <div class="user-info d-flex align-items-center gap-3">
+            <a asp-controller="Alertes" asp-action="Index" class="position-relative" id="alertesLink" style="text-decoration: none; color: inherit;">
+                <i class="bi bi-bell-fill" style="font-size: 1.2rem;"></i>
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="alertesBadge" style="display: none; font-size: 0.7rem;">0</span>
+            </a>
+            <span class="user-badge">
+                <i class="bi bi-person-circle me-2"></i>
+                @Context.Session.GetString("Username") - @Context.Session.GetString("UserRole")
+            </span>
+        </div>
+    </div>
+
+    @RenderBody()
+</div>
+
+<!-- jQuery (requis pour la validation) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Charger le nombre d'alertes non lues
+    function loadAlertesCount() {
+        fetch('/Alertes/GetUnreadCount')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.getElementById('alertesBadge');
+                if (badge && data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'block';
+                } else if (badge) {
+                    badge.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+
+    // Charger au démarrage et toutes les 30 secondes
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAlertesCount();
+        setInterval(loadAlertesCount, 30000);
+    });
+
+    // Vérifier les rappels de RDV (24h avant)
+    function checkRappelsRDV() {
+        fetch('/RendezVous/CheckRappels')
+            .then(response => response.json())
+            .then(data => {
+                if (data.rappels && data.rappels.length > 0) {
+                    data.rappels.forEach(function(rappel) {
+                        if (Notification.permission === 'granted') {
+                            new Notification('Rappel Rendez-vous', {
+                                body: rappel.message,
+                                icon: '/favicon.ico'
+                            });
+                        } else if (Notification.permission !== 'denied') {
+                            Notification.requestPermission().then(function(permission) {
+                                if (permission === 'granted') {
+                                    new Notification('Rappel Rendez-vous', {
+                                        body: rappel.message,
+                                        icon: '/favicon.ico'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+
+    // Vérifier les rappels toutes les heures
+    if ('Notification' in window) {
+        Notification.requestPermission();
+        setInterval(checkRappelsRDV, 3600000);
+        checkRappelsRDV();
+    }
+</script>
+
+@RenderSection("Scripts", required: false)
+
+</body>
+</html>

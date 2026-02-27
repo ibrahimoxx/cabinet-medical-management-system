@@ -1,0 +1,138 @@
+@model Cabinet_Medical.Models.Patient
+
+@{
+    ViewData["Title"] = "Ajouter un Patient";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-person-plus me-2"></i>Ajouter un Patient
+        </h4>
+    </div>
+    <div class="card-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            @if (ViewBag.ReturnUrl != null)
+            {
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+            }
+
+            <h5 class="mb-3 text-primary"><i class="bi bi-person-circle me-2"></i>Informations de connexion</h5>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nom d'utilisateur <span class="text-danger">*</span></label>
+                    <input type="text" name="Username" class="form-control" required />
+                    @if (ViewData.ModelState["Username"]?.Errors.Any() == true)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["Username"].Errors.First().ErrorMessage</span>
+                    }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="Email" class="form-control" required />
+                    @if (ViewData.ModelState["Email"]?.Errors.Any() == true)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["Email"].Errors.First().ErrorMessage</span>
+                    }
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                    <input type="password" name="Password" class="form-control" required minlength="4" />
+                    <small class="text-muted">Minimum 4 caractères</small>
+                    @if (ViewData.ModelState["Password"]?.Errors.Any() == true)
+                    {
+                        <span class="text-danger d-block">@ViewData.ModelState["Password"].Errors.First().ErrorMessage</span>
+                    }
+                </div>
+            </div>
+
+            <hr class="my-4" />
+            
+            <h5 class="mb-3 text-primary"><i class="bi bi-file-person me-2"></i>Informations personnelles</h5>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nom <span class="text-danger">*</span></label>
+                    <input type="text" name="Nom" class="form-control" required />
+                    @if (ViewData.ModelState["Nom"]?.Errors.Any() == true)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["Nom"].Errors.First().ErrorMessage</span>
+                    }
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                    <input type="text" name="Prenom" class="form-control" required />
+                    @if (ViewData.ModelState["Prenom"]?.Errors.Any() == true)
+                    {
+                        <span class="text-danger">@ViewData.ModelState["Prenom"].Errors.First().ErrorMessage</span>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Date de naissance</label>
+                    <input type="date" name="DateNaissance" class="form-control" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Téléphone</label>
+                    <input type="text" name="Telephone" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Adresse</label>
+                <input type="text" name="Adresse" class="form-control" />
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Antécédents médicaux</label>
+                <textarea name="AntecedentsMedicaux" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Créer
+                </button>
+                @if (!string.IsNullOrEmpty(ViewBag.ReturnUrl))
+                {
+                    <a href="@ViewBag.ReturnUrl" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Annuler et retourner
+                    </a>
+                }
+                else
+                {
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Annuler
+                    </a>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

@@ -1,0 +1,43 @@
+@model Cabinet_Medical.Models.Consultation
+
+@{
+    ViewData["Title"] = "Supprimer une Consultation";
+}
+
+<div class="card fade-in">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>Confirmer la suppression
+        </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Attention !</strong> Cette action supprimera également toutes les ordonnances associées.
+        </div>
+
+        <dl class="row">
+            <dt class="col-sm-3">Date</dt>
+            <dd class="col-sm-9">@Model.DateConsultation.ToString("dd/MM/yyyy à HH:mm")</dd>
+
+            <dt class="col-sm-3">Patient</dt>
+            <dd class="col-sm-9"><strong>@Model.DossierMedical?.Patient?.Nom @Model.DossierMedical?.Patient?.Prenom</strong></dd>
+
+            <dt class="col-sm-3">Diagnostic</dt>
+            <dd class="col-sm-9">@(Model.Diagnostic ?? "N/A")</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post" class="mt-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>Confirmer la suppression
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-2"></i>Annuler
+            </a>
+        </form>
+    </div>
+</div>
+

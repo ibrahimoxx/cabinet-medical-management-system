@@ -1,0 +1,124 @@
+@model Cabinet_Medical.Models.Facture
+
+@{
+    ViewData["Title"] = "Imprimer Facture";
+    Layout = null;
+    var montantPaye = Model.Paiements?.Sum(p => p.Montant) ?? 0;
+    var reste = Model.Montant - montantPaye;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Facture #@Model.Id</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 20px; }
+        .section { margin-bottom: 20px; }
+        .section h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table th, table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        table th { background-color: #f5f5f5; }
+        .total { font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FACTURE</h1>
+        <p>Cabinet Medical</p>
+        <p>N° Facture : #@Model.Id</p>
+    </div>
+
+    <div class="section">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <h3>Facturé à :</h3>
+                <p><strong>@Model.Patient?.Nom @Model.Patient?.Prenom</strong></p>
+                <p>@Model.Patient?.Adresse</p>
+                <p>@Model.Patient?.Telephone</p>
+            </div>
+            <div>
+                <h3>Détails :</h3>
+                <p><strong>Date :</strong> @Model.DateFacture.ToString("dd/MM/yyyy")</p>
+                <p><strong>Consultation :</strong> @Model.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</p>
+                <p><strong>Médecin :</strong> Dr. @Model.Consultation?.Medecin?.Nom @Model.Consultation?.Medecin?.Prenom</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th style="text-align: right;">Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Consultation médicale du @Model.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</td>
+                    <td style="text-align: right;">@Model.Montant.ToString("C")</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th style="text-align: right;">Total :</th>
+                    <th style="text-align: right;">@Model.Montant.ToString("C")</th>
+                </tr>
+                @if (montantPaye > 0)
+                {
+                    <tr>
+                        <td style="text-align: right;">Payé :</td>
+                        <td style="text-align: right;">@montantPaye.ToString("C")</td>
+                    </tr>
+                    @if (reste > 0)
+                    {
+                        <tr>
+                            <th style="text-align: right;">Reste à payer :</th>
+                            <th style="text-align: right; color: red;">@reste.ToString("C")</th>
+                        </tr>
+                    }
+                }
+            </tfoot>
+        </table>
+    </div>
+
+    @if (Model.Paiements != null && Model.Paiements.Any())
+    {
+        <div class="section">
+            <h3>Paiements reçus</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Mode</th>
+                        <th style="text-align: right;">Montant</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var paiement in Model.Paiements)
+                    {
+                        <tr>
+                            <td>@paiement.DatePaiement.ToString("dd/MM/yyyy")</td>
+                            <td>@paiement.ModePaiement</td>
+                            <td style="text-align: right;">@paiement.Montant.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <div class="footer">
+        <p>Document généré le @DateTime.Now.ToString("dd/MM/yyyy à HH:mm")</p>
+        <p>Merci de votre confiance</p>
+    </div>
+
+    <script>
+        window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>
+

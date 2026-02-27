@@ -1,0 +1,138 @@
+@model IEnumerable<Cabinet_Medical.Models.Patient>
+
+@{
+    ViewData["Title"] = "Gestion des Patients";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show fade-in" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="bi bi-people-fill me-2"></i>Patients
+            </h4>
+            <!-- EXTEND: Consulter patients <<extend>> Ajouter patient -->
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle me-2"></i>Ajouter un patient
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- FILTRE DE RECHERCHE -->
+        <div class="mb-4 p-3 bg-light rounded">
+            <form method="get" action="@Url.Action("Index")" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted">Rechercher un patient</label>
+                    <input type="text" name="search" class="form-control form-control-sm" 
+                           value="@ViewBag.Search" placeholder="Nom, prénom, email ou téléphone">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-sm me-2">
+                        <i class="bi bi-search me-1"></i>Rechercher
+                    </button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(ViewBag.Search))
+            {
+                <div class="mt-2">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Réinitialiser
+                    </a>
+                    <small class="text-muted ms-2">
+                        <i class="bi bi-funnel me-1"></i>Recherche: "@ViewBag.Search"
+                    </small>
+                </div>
+            }
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Date de naissance</th>
+                            <th>Dossier Médical</th>
+                            <th style="width: 250px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var patient in Model)
+                        {
+                            var hasDossier = patient.DossierMedical != null;
+                            <tr>
+                                <td><strong>@patient.Nom</strong></td>
+                                <td>@patient.Prenom</td>
+                                <td>@(patient.User?.Email ?? "N/A")</td>
+                                <td>@(patient.Telephone ?? "N/A")</td>
+                                <td>@(patient.DateNaissance?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                <td>
+                                    @if (hasDossier)
+                                    {
+                                        <span class="badge badge-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Oui
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Non
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@patient.Id" class="btn btn-sm btn-info" title="Détails">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <!-- EXTEND: Modifier patient -->
+                                    <a asp-action="Edit" asp-route-id="@patient.Id" class="btn btn-sm btn-warning" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    @if (!hasDossier)
+                                    {
+                                        <a asp-controller="DossierMedicals" asp-action="Create" asp-route-patientId="@patient.Id" class="btn btn-sm btn-success" title="Créer dossier médical">
+                                            <i class="bi bi-file-earmark-medical"></i> Dossier
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="DossierMedicals" asp-action="Consulter" asp-route-id="@patient.DossierMedical.Id" class="btn btn-sm btn-info" title="Consulter dossier">
+                                            <i class="bi bi-file-earmark-medical"></i>
+                                        </a>
+                                    }
+                                    <!-- EXTEND: Supprimer patient -->
+                                    <a asp-action="Delete" asp-route-id="@patient.Id" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-people" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Aucun patient enregistré.</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter le premier patient
+                </a>
+            </div>
+        }
+    </div>
+</div>
+

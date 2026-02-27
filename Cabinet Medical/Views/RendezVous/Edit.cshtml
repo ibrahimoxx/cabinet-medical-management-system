@@ -1,0 +1,91 @@
+@model Cabinet_Medical.Models.RendezVous
+
+@{
+    ViewData["Title"] = "Modifier un Rendez-vous";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-pencil-square me-2"></i>Modifier un Rendez-vous
+        </h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="PatientId" class="form-label">Patient <span class="text-danger">*</span></label>
+                    <select asp-for="PatientId" class="form-select" required>
+                        @foreach (var patient in ViewBag.Patients as IEnumerable<Cabinet_Medical.Models.Patient>)
+                        {
+                            <option value="@patient.Id" selected="@(patient.Id == Model.PatientId)">
+                                @patient.Nom @patient.Prenom (@patient.User?.Email)
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="PatientId" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="MedecinId" class="form-label">Médecin <span class="text-danger">*</span></label>
+                    <select asp-for="MedecinId" class="form-select" required>
+                        @foreach (var medecin in ViewBag.Medecins as IEnumerable<Cabinet_Medical.Models.Medecin>)
+                        {
+                            <option value="@medecin.Id" selected="@(medecin.Id == Model.MedecinId)">
+                                Dr. @medecin.Nom @medecin.Prenom (@medecin.Specialite)
+                            </option>
+                        }
+                    </select>
+                    <span asp-validation-for="MedecinId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateRdv" class="form-label">Date <span class="text-danger">*</span></label>
+                    <input asp-for="DateRdv" type="date" class="form-control" required />
+                    <span asp-validation-for="DateRdv" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="HeureRdv" class="form-label">Heure <span class="text-danger">*</span></label>
+                    <input asp-for="HeureRdv" type="time" class="form-control" required />
+                    <span asp-validation-for="HeureRdv" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Motif" class="form-label">Motif</label>
+                <textarea asp-for="Motif" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Motif" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Statut" class="form-label">Statut</label>
+                <select asp-for="Statut" class="form-select">
+                    <option value="Planifie" selected="@(Model.Statut == "Planifie")">Planifié</option>
+                    <option value="Termine" selected="@(Model.Statut == "Termine")">Terminé</option>
+                    <option value="Annule" selected="@(Model.Statut == "Annule")">Annulé</option>
+                </select>
+                <span asp-validation-for="Statut" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Enregistrer
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

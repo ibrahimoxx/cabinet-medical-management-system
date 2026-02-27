@@ -1,0 +1,47 @@
+@model Cabinet_Medical.Models.Patient
+
+@{
+    ViewData["Title"] = "Détails du Patient";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-person-circle me-2"></i>Détails du Patient
+        </h4>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Nom</dt>
+            <dd class="col-sm-9"><strong>@Model.Nom</strong></dd>
+
+            <dt class="col-sm-3">Prénom</dt>
+            <dd class="col-sm-9">@Model.Prenom</dd>
+
+            <dt class="col-sm-3">Email</dt>
+            <dd class="col-sm-9">@(Model.User?.Email ?? "N/A")</dd>
+
+            <dt class="col-sm-3">Téléphone</dt>
+            <dd class="col-sm-9">@(Model.Telephone ?? "N/A")</dd>
+
+            <dt class="col-sm-3">Date de naissance</dt>
+            <dd class="col-sm-9">@(Model.DateNaissance?.ToString("dd/MM/yyyy") ?? "N/A")</dd>
+
+            <dt class="col-sm-3">Adresse</dt>
+            <dd class="col-sm-9">@(Model.Adresse ?? "N/A")</dd>
+
+            <dt class="col-sm-3">Antécédents médicaux</dt>
+            <dd class="col-sm-9">@(Model.AntecedentsMedicaux ?? "Aucun")</dd>
+        </dl>
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil me-2"></i>Modifier
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+            </a>
+        </div>
+    </div>
+</div>
+

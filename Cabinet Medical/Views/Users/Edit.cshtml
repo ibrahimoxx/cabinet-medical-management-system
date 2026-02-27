@@ -1,0 +1,89 @@
+﻿@model Cabinet_Medical.Models.User
+
+@{
+    ViewData["Title"] = "Modifier utilisateur";
+}
+
+<div class="card p-4">
+    <h4 class="mb-4">
+        <i class="bi bi-pencil-square"></i> Modifier utilisateur
+    </h4>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <!-- USERNAME (READ ONLY) -->
+        <div class="mb-3">
+            <label class="form-label">Nom d'utilisateur</label>
+            <input class="form-control" value="@Model.Username" disabled />
+            <input type="hidden" asp-for="Username" />
+        </div>
+
+        <!-- EMAIL -->
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email</label>
+            <input asp-for="Email" type="email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <!-- ROLE -->
+        <div class="mb-3">
+            <label asp-for="Role" class="form-label">Rôle</label>
+            @if (Model.Role == "Admin")
+            {
+                <input class="form-control" value="Admin" disabled />
+                <input type="hidden" asp-for="Role" />
+                <small class="text-muted">Le rôle Admin ne peut pas être modifié</small>
+            }
+            else
+            {
+                <select asp-for="Role" class="form-select">
+                    <option value="Secretaire">Secrétaire</option>
+                    <option value="Medecin">Médecin</option>
+                    <option value="Patient">Patient</option>
+                </select>
+                <span asp-validation-for="Role" class="text-danger"></span>
+            }
+        </div>
+
+        <!-- STATUS -->
+        <div class="form-check mb-4">
+            @if (Model.Role == "Admin")
+            {
+                <input asp-for="IsActive" class="form-check-input" checked disabled />
+                <input type="hidden" asp-for="IsActive" value="true" />
+                <label class="form-check-label">Utilisateur actif (Admin est toujours actif)</label>
+            }
+            else
+            {
+                <input asp-for="IsActive" class="form-check-input" />
+                <label asp-for="IsActive" class="form-check-label">Utilisateur actif</label>
+            }
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Enregistrer
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary ms-2">
+            Annuler
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,100 @@
+@model IEnumerable<Cabinet_Medical.Models.DossierMedical>
+
+@{
+    ViewData["Title"] = "Dossiers Médicaux";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show fade-in" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="bi bi-file-earmark-medical me-2"></i>Dossiers Médicaux
+            </h4>
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle me-2"></i>Nouveau dossier
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- FILTRE DE RECHERCHE -->
+        <div class="mb-4 p-3 bg-light rounded">
+            <form method="get" action="@Url.Action("Index")" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted">Rechercher par patient</label>
+                    <input type="text" name="searchPatient" class="form-control form-control-sm" 
+                           value="@ViewBag.SearchPatient" placeholder="Nom ou prénom du patient">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-sm me-2">
+                        <i class="bi bi-search me-1"></i>Rechercher
+                    </button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(ViewBag.SearchPatient))
+            {
+                <div class="mt-2">
+                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Réinitialiser
+                    </a>
+                    <small class="text-muted ms-2">
+                        <i class="bi bi-funnel me-1"></i>Recherche: "@ViewBag.SearchPatient"
+                    </small>
+                </div>
+            }
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Date de création</th>
+                            <th>Remarques</th>
+                            <th style="width: 200px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var dossier in Model)
+                        {
+                            <tr>
+                                <td><strong>@dossier.Patient?.Nom @dossier.Patient?.Prenom</strong></td>
+                                <td>@dossier.DateCreation.ToString("dd/MM/yyyy")</td>
+                                <td>@(dossier.Remarques?.Length > 50 ? dossier.Remarques.Substring(0, 50) + "..." : dossier.Remarques ?? "N/A")</td>
+                                <td>
+                                    <a asp-action="Consulter" asp-route-id="@dossier.Id" class="btn btn-sm btn-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Edit" asp-route-id="@dossier.Id" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-file-earmark-medical" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Aucun dossier médical enregistré.</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Créer le premier dossier
+                </a>
+            </div>
+        }
+    </div>
+</div>
+

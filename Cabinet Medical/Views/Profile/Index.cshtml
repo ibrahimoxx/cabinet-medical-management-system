@@ -1,0 +1,66 @@
+﻿@model Cabinet_Medical.Models.User
+
+@{
+    ViewData["Title"] = "Mon profil";
+}
+
+<div class="card p-4">
+    <h4 class="mb-4">
+        <i class="bi bi-person-circle"></i> Mon profil
+    </h4>
+
+    <!-- COMMON USER INFO -->
+    <div class="mb-3">
+        <strong>Nom d'utilisateur :</strong>
+        <div class="text-muted">@Model.Username</div>
+    </div>
+
+    <div class="mb-3">
+        <strong>Email :</strong>
+        <div class="text-muted">@Model.Email</div>
+    </div>
+
+    <div class="mb-3">
+        <strong>Rôle :</strong>
+        <div class="text-muted">@Model.Role</div>
+    </div>
+
+    <hr />
+
+    <!-- ROLE-SPECIFIC INFO -->
+
+    @if (Model.Role == "Patient" && Model.Patient != null)
+    {
+        <h5>Informations Patient</h5>
+
+        <div class="mb-2"><strong>Nom :</strong> @Model.Patient.Nom</div>
+        <div class="mb-2"><strong>Prénom :</strong> @Model.Patient.Prenom</div>
+        <div class="mb-2"><strong>Téléphone :</strong> @Model.Patient.Telephone</div>
+        <div class="mb-2"><strong>Adresse :</strong> @Model.Patient.Adresse</div>
+    }
+
+    @if (Model.Role == "Medecin" && Model.Medecin != null)
+    {
+        <h5>Informations Médecin</h5>
+
+        <div class="mb-2"><strong>Nom :</strong> @Model.Medecin.Nom</div>
+        <div class="mb-2"><strong>Prénom :</strong> @Model.Medecin.Prenom</div>
+        <div class="mb-2"><strong>Spécialité :</strong> @Model.Medecin.Specialite</div>
+        <div class="mb-2"><strong>Téléphone :</strong> @Model.Medecin.Telephone</div>
+    }
+
+    @if (Model.Role == "Secretaire" && Model.Secretaire != null)
+    {
+        <h5>Informations Secrétaire</h5>
+
+        <div class="mb-2"><strong>Nom :</strong> @Model.Secretaire.Nom</div>
+        <div class="mb-2"><strong>Prénom :</strong> @Model.Secretaire.Prenom</div>
+        <div class="mb-2"><strong>Téléphone :</strong> @Model.Secretaire.Telephone</div>
+    }
+
+    <hr />
+
+    <a asp-action="Edit" class="btn btn-primary">
+        <i class="bi bi-pencil"></i> Modifier mon profil
+    </a>
+</div>

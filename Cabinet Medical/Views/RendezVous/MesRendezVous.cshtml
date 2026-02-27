@@ -1,0 +1,163 @@
+@model IEnumerable<Cabinet_Medical.Models.RendezVous>
+
+@{
+    ViewData["Title"] = "Mes Rendez-vous";
+    var role = Context.Session.GetString("UserRole");
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-calendar-check me-2"></i>Mes Rendez-vous
+        </h4>
+    </div>
+    <div class="card-body">
+        <!-- FILTRES DE RECHERCHE -->
+        <div class="mb-4 p-3 bg-light rounded">
+            <form method="get" action="@Url.Action("MesRendezVous")" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted">
+                        @if (role == "Medecin")
+                        {
+                            <span>Rechercher par patient</span>
+                        }
+                        else
+                        {
+                            <span>Rechercher par médecin</span>
+                        }
+                    </label>
+                    <input type="text" name="search" class="form-control form-control-sm" 
+                           value="@ViewBag.Search" placeholder="@(role == "Medecin" ? "Nom du patient" : "Nom du médecin")">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">Statut</label>
+                    <select name="statut" class="form-select form-select-sm">
+                        <option value="">Tous</option>
+                        @if (ViewBag.Statut == "Planifie")
+                        {
+                            <option value="Planifie" selected>Planifié</option>
+                        }
+                        else
+                        {
+                            <option value="Planifie">Planifié</option>
+                        }
+                        @if (ViewBag.Statut == "Termine")
+                        {
+                            <option value="Termine" selected>Terminé</option>
+                        }
+                        else
+                        {
+                            <option value="Termine">Terminé</option>
+                        }
+                        @if (ViewBag.Statut == "Annule")
+                        {
+                            <option value="Annule" selected>Annulé</option>
+                        }
+                        else
+                        {
+                            <option value="Annule">Annulé</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted">Date</label>
+                    <input type="date" name="date" class="form-control form-control-sm" value="@ViewBag.Date">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-sm me-2">
+                        <i class="bi bi-search me-1"></i>Rechercher
+                    </button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(ViewBag.Search) || !string.IsNullOrEmpty(ViewBag.Statut) || !string.IsNullOrEmpty(ViewBag.Date))
+            {
+                <div class="mt-2">
+                    <a href="@Url.Action("MesRendezVous")" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Réinitialiser
+                    </a>
+                    <small class="text-muted ms-2">
+                        <i class="bi bi-funnel me-1"></i>Filtres actifs
+                    </small>
+                </div>
+            }
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            @if (role == "Medecin")
+                            {
+                                <th>Patient</th>
+                            }
+                            else if (role == "Patient")
+                            {
+                                <th>Médecin</th>
+                            }
+                            <th>Motif</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var rdv in Model)
+                        {
+                            <tr>
+                                <td>@rdv.DateRdv.ToString("dd/MM/yyyy")</td>
+                                <td>@rdv.HeureRdv.ToString(@"hh\:mm")</td>
+                                @if (role == "Medecin")
+                                {
+                                    <td><strong>@rdv.Patient?.Nom @rdv.Patient?.Prenom</strong></td>
+                                }
+                                else if (role == "Patient")
+                                {
+                                    <td>Dr. @rdv.Medecin?.Nom @rdv.Medecin?.Prenom</td>
+                                }
+                                <td>@(rdv.Motif ?? "N/A")</td>
+                                <td>
+                                    @if (rdv.Statut == "Planifie")
+                                    {
+                                        <span class="badge badge-info">Planifié</span>
+                                    }
+                                    else if (rdv.Statut == "Termine")
+                                    {
+                                        <span class="badge badge-success">Terminé</span>
+                                    }
+                                    else if (rdv.Statut == "Annule")
+                                    {
+                                        <span class="badge badge-danger">Annulé</span>
+                                    }
+                                </td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@rdv.Id" class="btn btn-sm btn-info" title="Détails">
+                                        <i class="bi bi-eye"></i> Détails
+                                    </a>
+                                    <!-- EXTEND: Annuler rendez-vous (Patient) -->
+                                    @if (role == "Patient" && rdv.Statut == "Planifie" && rdv.DateRdv.Date >= DateTime.Today)
+                                    {
+                                        <a asp-action="Annuler" asp-route-id="@rdv.Id" class="btn btn-sm btn-danger" 
+                                           onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?');" title="Annuler">
+                                            <i class="bi bi-x-circle"></i> Annuler
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Aucun rendez-vous.</p>
+            </div>
+        }
+    </div>
+</div>
+

@@ -1,0 +1,265 @@
+@model Cabinet_Medical.Models.RendezVous
+
+@{
+    ViewData["Title"] = "Nouveau Rendez-vous";
+    var isPatient = ViewBag.IsPatient as bool? ?? false;
+    var patientId = ViewBag.PatientId as int?;
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-calendar-plus me-2"></i>Nouveau Rendez-vous
+        </h4>
+    </div>
+    <div class="card-body">
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info alert-dismissible fade show fade-in" role="alert">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                @TempData["InfoMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <p class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>@error.ErrorMessage</p>
+                }
+            </div>
+        }
+
+        <form asp-action="Create" method="post" id="rdvForm">
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                @if (!isPatient)
+                {
+                    <div class="col-md-6 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label asp-for="PatientId" class="form-label mb-0">Patient <span class="text-danger">*</span></label>
+                            <a asp-controller="Patients" asp-action="Create" asp-route-returnUrl="@Url.Action("Create", "RendezVous")" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-person-plus me-1"></i>Nouveau Patient
+                            </a>
+                        </div>
+                        <select asp-for="PatientId" id="patientSelectRdv" class="form-select" required>
+                            <option value="">-- Sélectionner un patient --</option>
+                            @if (ViewBag.Patients != null)
+                            {
+                                @foreach (var patient in ViewBag.Patients as IEnumerable<Cabinet_Medical.Models.Patient>)
+                                {
+                                    var isSelected = ViewBag.SelectedPatientId != null && patient.Id == (int)ViewBag.SelectedPatientId;
+                                    <option value="@patient.Id" selected="@isSelected">@patient.Nom @patient.Prenom (@patient.User?.Email)</option>
+                                }
+                            }
+                        </select>
+                        <small class="text-muted">Si le patient n'existe pas, cliquez sur "Nouveau Patient" ci-dessus.</small>
+                        <span asp-validation-for="PatientId" class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="PatientId" value="@patientId" />
+                }
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="MedecinId" class="form-label">Médecin <span class="text-danger">*</span></label>
+                    <select asp-for="MedecinId" id="medecinSelect" class="form-select" required>
+                        <option value="">-- Sélectionner un médecin --</option>
+                        @foreach (var medecin in ViewBag.Medecins as IEnumerable<Cabinet_Medical.Models.Medecin>)
+                        {
+                            <option value="@medecin.Id">Dr. @medecin.Nom @medecin.Prenom (@medecin.Specialite)</option>
+                        }
+                    </select>
+                    <span asp-validation-for="MedecinId" class="text-danger"></span>
+                    <div id="medecinDisponibilite" class="mt-2" style="display: none;">
+                        <small class="text-muted">
+                            <i class="bi bi-info-circle"></i> <span id="disponibiliteText"></span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateRdv" class="form-label">Date <span class="text-danger">*</span></label>
+                    <input asp-for="DateRdv" type="date" id="dateRdv" class="form-control" required min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <small class="text-muted">Lundi - Vendredi uniquement</small>
+                    <span asp-validation-for="DateRdv" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label asp-for="HeureRdv" class="form-label">Heure <span class="text-danger">*</span></label>
+                    <select asp-for="HeureRdv" id="heureRdv" class="form-select" required>
+                        <option value="">-- Sélectionner une heure --</option>
+                    </select>
+                    <small class="text-muted">Créneaux disponibles : 08:00 - 17:00 (par pas de 30 min)</small>
+                    <span asp-validation-for="HeureRdv" class="text-danger"></span>
+                    <div id="loadingSlots" class="text-muted small mt-2" style="display: none;">
+                        <i class="bi bi-arrow-repeat spin"></i> Chargement des créneaux disponibles...
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Motif" class="form-label">Motif</label>
+                <textarea asp-for="Motif" class="form-control" rows="3" placeholder="Raison de la consultation..."></textarea>
+                <span asp-validation-for="Motif" class="text-danger"></span>
+            </div>
+
+            @if (!isPatient)
+            {
+                <div class="mb-4">
+                    <label asp-for="Statut" class="form-label">Statut</label>
+                    <select asp-for="Statut" class="form-select">
+                        <option value="Planifie">Planifié</option>
+                        <option value="Termine">Terminé</option>
+                        <option value="Annule">Annulé</option>
+                    </select>
+                    <span asp-validation-for="Statut" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <input type="hidden" asp-for="Statut" value="Planifie" />
+            }
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle me-2"></i>Réserver
+                </button>
+                <a asp-action="@(isPatient ? "MesRendezVous" : "Index")" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <style>
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+        @@keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateRdv = document.getElementById('dateRdv');
+            const medecinSelect = document.getElementById('medecinSelect');
+            const heureRdv = document.getElementById('heureRdv');
+            const loadingSlots = document.getElementById('loadingSlots');
+
+            function loadAvailableSlots() {
+                const medecinId = medecinSelect.value;
+                const date = dateRdv.value;
+
+                if (!medecinId || !date) {
+                    heureRdv.innerHTML = '<option value="">-- Sélectionner un médecin et une date --</option>';
+                    return;
+                }
+
+                loadingSlots.style.display = 'block';
+                heureRdv.disabled = true;
+
+                fetch(`/RendezVous/GetAvailableSlots?medecinId=${medecinId}&date=${date}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingSlots.style.display = 'none';
+                        heureRdv.innerHTML = '<option value="">-- Sélectionner une heure --</option>';
+
+                        if (data.availableSlots && data.availableSlots.length > 0) {
+                            data.availableSlots.forEach(slot => {
+                                const option = document.createElement('option');
+                                option.value = slot;
+                                option.textContent = slot;
+                                heureRdv.appendChild(option);
+                            });
+                            heureRdv.disabled = false;
+                        } else {
+                            heureRdv.innerHTML = '<option value="">Aucun créneau disponible</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                        loadingSlots.style.display = 'none';
+                        heureRdv.innerHTML = '<option value="">Erreur de chargement</option>';
+                    });
+            }
+
+            // Fonction pour charger la disponibilité du médecin
+            function loadMedecinDisponibilite() {
+                const medecinId = medecinSelect.value;
+                const date = dateRdv.value;
+                const disponibiliteDiv = document.getElementById('medecinDisponibilite');
+                const disponibiliteText = document.getElementById('disponibiliteText');
+
+                if (!medecinId || !date) {
+                    disponibiliteDiv.style.display = 'none';
+                    return;
+                }
+
+                fetch(`/RendezVous/GetAvailableSlots?medecinId=${medecinId}&date=${date}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.medecinDisponible !== undefined) {
+                            disponibiliteDiv.style.display = 'block';
+                            if (data.medecinDisponible) {
+                                disponibiliteText.innerHTML = `<span class="text-success"><i class="bi bi-check-circle-fill"></i> Médecin disponible - ${data.availableSlots.length} créneaux libres`;
+                                if (data.tauxOccupation) {
+                                    disponibiliteText.innerHTML += ` (${data.tauxOccupation}% occupé)`;
+                                }
+                                disponibiliteText.innerHTML += '</span>';
+                            } else {
+                                disponibiliteText.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle-fill"></i> Médecin non disponible ce jour</span>';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur:', error);
+                    });
+            }
+
+            // Écouter les changements de date et médecin
+            dateRdv.addEventListener('change', function() {
+                // Vérifier que c'est un jour ouvrable
+                const selectedDate = new Date(this.value);
+                const dayOfWeek = selectedDate.getDay();
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
+                    alert('Les rendez-vous ne peuvent être pris que du lundi au vendredi.');
+                    this.value = '';
+                    return;
+                }
+                loadAvailableSlots();
+                loadMedecinDisponibilite();
+            });
+
+            medecinSelect.addEventListener('change', function() {
+                loadAvailableSlots();
+                loadMedecinDisponibilite();
+            });
+
+            // Formater la date minimale (aujourd'hui)
+            const today = new Date().toISOString().split('T')[0];
+            dateRdv.min = today;
+        });
+
+        // Empêcher la sélection du weekend
+        document.getElementById('dateRdv')?.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const dayOfWeek = selectedDate.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                alert('Les rendez-vous ne peuvent être pris que du lundi au vendredi.');
+                this.value = '';
+            }
+        });
+    </script>
+}
+

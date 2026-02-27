@@ -1,0 +1,59 @@
+@model IEnumerable<Cabinet_Medical.Models.Ordonnance>
+
+@{
+    ViewData["Title"] = "Mes Ordonnances";
+}
+
+<div class="card fade-in">
+    <div class="card-header">
+        <h4 class="mb-0">
+            <i class="bi bi-prescription2 me-2"></i>Mes Ordonnances
+        </h4>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Médecin</th>
+                            <th>Consultation</th>
+                            <th>Nombre d'éléments</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ordonnance in Model)
+                        {
+                            <tr>
+                                <td>@ordonnance.DateOrdonnance.ToString("dd/MM/yyyy")</td>
+                                <td>Dr. @ordonnance.Consultation?.Medecin?.Nom @ordonnance.Consultation?.Medecin?.Prenom</td>
+                                <td>@ordonnance.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</td>
+                                <td>@(ordonnance.OrdonnanceDetails?.Count() ?? 0) élément(s)</td>
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@ordonnance.Id" class="btn btn-sm btn-info" title="Détails">
+                                        <i class="bi bi-eye"></i> Voir
+                                    </a>
+                                    <!-- EXTEND: Imprimer ordonnance (Patient) -->
+                                    <a asp-action="Imprimer" asp-route-id="@ordonnance.Id" class="btn btn-sm btn-secondary" target="_blank" title="Imprimer">
+                                        <i class="bi bi-printer"></i> Imprimer
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-prescription2" style="font-size: 4rem; color: #ccc;"></i>
+                <p class="text-muted mt-3">Aucune ordonnance disponible.</p>
+            </div>
+        }
+    </div>
+</div>
+

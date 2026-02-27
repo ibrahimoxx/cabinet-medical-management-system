@@ -1,0 +1,58 @@
+@model Cabinet_Medical.Models.Consultation
+
+@{
+    ViewData["Title"] = "Imprimer Consultation";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Consultation - @Model.DateConsultation.ToString("dd/MM/yyyy")</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 20px; }
+        .section { margin-bottom: 20px; }
+        .section h3 { border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .footer { margin-top: 30px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CONSULTATION MÉDICALE</h1>
+        <p>Cabinet Medical</p>
+    </div>
+
+    <div class="section">
+        <h3>Informations Patient</h3>
+        <p><strong>Nom :</strong> @Model.DossierMedical?.Patient?.Nom @Model.DossierMedical?.Patient?.Prenom</p>
+        <p><strong>Date de naissance :</strong> @(Model.DossierMedical?.Patient?.DateNaissance?.ToString("dd/MM/yyyy") ?? "N/A")</p>
+    </div>
+
+    <div class="section">
+        <h3>Consultation</h3>
+        <p><strong>Date :</strong> @Model.DateConsultation.ToString("dd/MM/yyyy à HH:mm")</p>
+        <p><strong>Médecin :</strong> Dr. @Model.Medecin?.Nom @Model.Medecin?.Prenom - @Model.Medecin?.Specialite</p>
+    </div>
+
+    <div class="section">
+        <h3>Diagnostic</h3>
+        <p>@(Model.Diagnostic ?? "Aucun diagnostic")</p>
+    </div>
+
+    <div class="section">
+        <h3>Notes</h3>
+        <p>@(Model.Notes ?? "Aucune note")</p>
+    </div>
+
+    <div class="footer">
+        <p>Document généré le @DateTime.Now.ToString("dd/MM/yyyy à HH:mm")</p>
+    </div>
+
+    <script>
+        window.onload = function() { window.print(); }
+    </script>
+</body>
+</html>
+
