@@ -6,162 +6,167 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
     </div>
 }
 
-<div class="card p-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4>
-            <i class="bi bi-people"></i> Utilisateurs
-        </h4>
-
-        <!-- EXTEND: Ajouter utilisateur -->
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Ajouter utilisateur
-        </a>
+<!-- Page Header (matches gestion des utilisateur reference) -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Gestion des utilisateurs</h1>
+        <p>@Model.Count() utilisateur(s) — membres du cabinet médical</p>
     </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i>
+        Ajouter un utilisateur
+    </a>
+</div>
 
-    <!-- FILTRES DE RECHERCHE -->
-    <div class="mb-4 p-3 bg-light rounded">
-        <form method="get" action="@Url.Action("Index")" class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label small text-muted">Rechercher</label>
-                <input type="text" name="search" class="form-control form-control-sm" 
-                       value="@ViewBag.Search" placeholder="Username ou email">
-            </div>
-            <div class="col-md-2">
-                <label class="form-label small text-muted">Rôle</label>
-                <select name="role" class="form-select form-select-sm">
-                    <option value="">Tous</option>
-                    @if (ViewBag.Role == "Admin")
-                    {
-                        <option value="Admin" selected>Admin</option>
-                    }
-                    else
-                    {
-                        <option value="Admin">Admin</option>
-                    }
-                    @if (ViewBag.Role == "Medecin")
-                    {
-                        <option value="Medecin" selected>Médecin</option>
-                    }
-                    else
-                    {
-                        <option value="Medecin">Médecin</option>
-                    }
-                    @if (ViewBag.Role == "Secretaire")
-                    {
-                        <option value="Secretaire" selected>Secrétaire</option>
-                    }
-                    else
-                    {
-                        <option value="Secretaire">Secrétaire</option>
-                    }
-                    @if (ViewBag.Role == "Patient")
-                    {
-                        <option value="Patient" selected>Patient</option>
-                    }
-                    else
-                    {
-                        <option value="Patient">Patient</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label small text-muted">Statut</label>
-                <select name="statut" class="form-select form-select-sm">
-                    <option value="">Tous</option>
-                    @if (ViewBag.Statut == "Actif")
-                    {
-                        <option value="Actif" selected>Actif</option>
-                    }
-                    else
-                    {
-                        <option value="Actif">Actif</option>
-                    }
-                    @if (ViewBag.Statut == "Inactif")
-                    {
-                        <option value="Inactif" selected>Inactif</option>
-                    }
-                    else
-                    {
-                        <option value="Inactif">Inactif</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary btn-sm me-2">
-                    <i class="bi bi-search me-1"></i>Rechercher
-                </button>
-            </div>
-        </form>
-        @if (!string.IsNullOrEmpty(ViewBag.Search) || !string.IsNullOrEmpty(ViewBag.Role) || !string.IsNullOrEmpty(ViewBag.Statut))
+<!-- Filter Bar (matches reference style) -->
+<div class="filter-card">
+    <form method="get" action="@Url.Action("Index")">
+        <div class="input-group" style="flex:1;max-width:360px;">
+            <i class="fas fa-search input-icon"></i>
+            <input type="text" name="search" class="form-control"
+                   value="@ViewBag.Search" placeholder="Rechercher par nom ou email…">
+        </div>
+
+        <select name="role" class="form-control" style="width:160px;">
+            <option value="">Tous les rôles</option>
+            @if (ViewBag.Role == "Admin") { <option value="Admin" selected>Admin</option> }
+            else { <option value="Admin">Admin</option> }
+            @if (ViewBag.Role == "Medecin") { <option value="Medecin" selected>Médecin</option> }
+            else { <option value="Medecin">Médecin</option> }
+            @if (ViewBag.Role == "Secretaire") { <option value="Secretaire" selected>Secrétaire</option> }
+            else { <option value="Secretaire">Secrétaire</option> }
+            @if (ViewBag.Role == "Patient") { <option value="Patient" selected>Patient</option> }
+            else { <option value="Patient">Patient</option> }
+        </select>
+
+        <select name="statut" class="form-control" style="width:160px;">
+            <option value="">Tous les statuts</option>
+            @if (ViewBag.Statut == "Actif") { <option value="Actif" selected>Actif</option> }
+            else { <option value="Actif">Actif</option> }
+            @if (ViewBag.Statut == "Inactif") { <option value="Inactif" selected>Inactif</option> }
+            else { <option value="Inactif">Inactif</option> }
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-search"></i> Rechercher
+        </button>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Search?.ToString())
+          || !string.IsNullOrEmpty(ViewBag.Role?.ToString())
+          || !string.IsNullOrEmpty(ViewBag.Statut?.ToString()))
         {
-            <div class="mt-2">
-                <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
-                    <i class="bi bi-x-circle me-1"></i>Réinitialiser
-                </a>
-                <small class="text-muted ms-2">
-                    <i class="bi bi-funnel me-1"></i>Filtres actifs
-                </small>
-            </div>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Effacer
+            </a>
         }
+    </form>
+</div>
+
+<!-- Table Card (matches gestion des utilisateur reference exactly) -->
+<div class="table-card">
+    <div class="table-card-header">
+        <h2 class="table-card-title">Tous les utilisateurs</h2>
     </div>
-
-    <table class="table table-hover align-middle">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Statut</th>
-                <th style="width: 180px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
+    <div class="table-responsive">
+        <table>
+            <thead>
                 <tr>
-                    <td>@user.Username</td>
-                    <td>@user.Email</td>
-                    <td>@user.Role</td>
-                    <td>
-                        @if (user.IsActive)
-                        {
-                            <span class="badge bg-success">Actif</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-danger">Inactif</span>
-                        }
-                    </td>
-                    <td>
-                        <!-- EXTEND: Modifier -->
-                        <a asp-action="Edit" asp-route-id="@user.Id"
-                           class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-
-                        <!-- EXTEND: Désactiver -->
-                        @if (user.Role != "Admin")
-{
-    <a asp-action="ToggleStatus" asp-route-id="@user.Id"
-       class="btn btn-sm btn-secondary">
-        <i class="bi bi-power"></i>
-    </a>
-
-    <a asp-action="Delete" asp-route-id="@user.Id"
-       class="btn btn-sm btn-danger"
-       onclick="return confirm('Confirmer la suppression ?');">
-        <i class="bi bi-trash"></i>
-    </a>
-}
-                    </td>
+                    <th>Utilisateur</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Statut</th>
+                    <th style="text-align:right;">Actions</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div class="avatar-initials">
+                                    @user.Username.Substring(0, 1).ToUpper()
+                                </div>
+                                <div>
+                                    <div style="font-weight:700;color:#111827;">@user.Username</div>
+                                    <div style="font-size:.75rem;color:#9CA3AF;">ID: #@user.Id</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="color:#6B7280;">@user.Email</td>
+                        <td>
+                            @{
+                                var roleBadge = user.Role switch {
+                                    "Admin"      => "badge-blue",
+                                    "Medecin"    => "badge-green",
+                                    "Secretaire" => "badge-teal",
+                                    "Patient"    => "badge-purple",
+                                    _            => "badge-gray"
+                                };
+                                var roleIcon = user.Role switch {
+                                    "Admin"      => "fas fa-shield-alt",
+                                    "Medecin"    => "fas fa-user-md",
+                                    "Secretaire" => "fas fa-headset",
+                                    "Patient"    => "fas fa-user",
+                                    _            => "fas fa-user"
+                                };
+                            }
+                            <span class="badge @roleBadge">
+                                <i class="@roleIcon" style="font-size:.65rem;"></i>
+                                @user.Role
+                            </span>
+                        </td>
+                        <td>
+                            @if (user.IsActive)
+                            {
+                                <span class="badge badge-green">
+                                    <span class="badge-dot"></span>Actif
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-red">
+                                    <span class="badge-dot"></span>Inactif
+                                </span>
+                            }
+                        </td>
+                        <td style="text-align:right;">
+                            <div style="display:flex;justify-content:flex-end;gap:4px;">
+                                <a asp-action="Edit" asp-route-id="@user.Id"
+                                   class="btn-tbl-action" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                @if (user.Role != "Admin")
+                                {
+                                    <a asp-action="ToggleStatus" asp-route-id="@user.Id"
+                                       class="btn-tbl-action" title="Activer / Désactiver">
+                                        <i class="fas fa-power-off"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@user.Id"
+                                       class="btn-tbl-action danger" title="Supprimer"
+                                       onclick="return confirm('Confirmer la suppression de cet utilisateur ?');">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" style="text-align:center;padding:48px;color:#9CA3AF;">
+                            <i class="fas fa-users" style="font-size:2rem;margin-bottom:12px;color:#E5E7EB;"></i>
+                            <p style="margin:0;">Aucun utilisateur trouvé</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

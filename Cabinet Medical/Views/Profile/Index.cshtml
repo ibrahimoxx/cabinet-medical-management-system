@@ -4,63 +4,168 @@
     ViewData["Title"] = "Mon profil";
 }
 
-<div class="card p-4">
-    <h4 class="mb-4">
-        <i class="bi bi-person-circle"></i> Mon profil
-    </h4>
-
-    <!-- COMMON USER INFO -->
-    <div class="mb-3">
-        <strong>Nom d'utilisateur :</strong>
-        <div class="text-muted">@Model.Username</div>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Mon Profil</h1>
+        <p>Vos informations personnelles et paramètres de compte</p>
     </div>
-
-    <div class="mb-3">
-        <strong>Email :</strong>
-        <div class="text-muted">@Model.Email</div>
-    </div>
-
-    <div class="mb-3">
-        <strong>Rôle :</strong>
-        <div class="text-muted">@Model.Role</div>
-    </div>
-
-    <hr />
-
-    <!-- ROLE-SPECIFIC INFO -->
-
-    @if (Model.Role == "Patient" && Model.Patient != null)
-    {
-        <h5>Informations Patient</h5>
-
-        <div class="mb-2"><strong>Nom :</strong> @Model.Patient.Nom</div>
-        <div class="mb-2"><strong>Prénom :</strong> @Model.Patient.Prenom</div>
-        <div class="mb-2"><strong>Téléphone :</strong> @Model.Patient.Telephone</div>
-        <div class="mb-2"><strong>Adresse :</strong> @Model.Patient.Adresse</div>
-    }
-
-    @if (Model.Role == "Medecin" && Model.Medecin != null)
-    {
-        <h5>Informations Médecin</h5>
-
-        <div class="mb-2"><strong>Nom :</strong> @Model.Medecin.Nom</div>
-        <div class="mb-2"><strong>Prénom :</strong> @Model.Medecin.Prenom</div>
-        <div class="mb-2"><strong>Spécialité :</strong> @Model.Medecin.Specialite</div>
-        <div class="mb-2"><strong>Téléphone :</strong> @Model.Medecin.Telephone</div>
-    }
-
-    @if (Model.Role == "Secretaire" && Model.Secretaire != null)
-    {
-        <h5>Informations Secrétaire</h5>
-
-        <div class="mb-2"><strong>Nom :</strong> @Model.Secretaire.Nom</div>
-        <div class="mb-2"><strong>Prénom :</strong> @Model.Secretaire.Prenom</div>
-        <div class="mb-2"><strong>Téléphone :</strong> @Model.Secretaire.Telephone</div>
-    }
-
-    <hr />
-
     <a asp-action="Edit" class="btn btn-primary">
-        <i class="bi bi-pencil"></i> Modifier mon profil
+        <i class="fas fa-edit"></i> Modifier le profil
     </a>
+</div>
+
+<!-- Two-column layout: avatar card + info card -->
+<div style="display:grid;grid-template-columns:300px 1fr;gap:24px;">
+
+    <!-- Avatar / Account Card -->
+    <div class="profile-avatar-card">
+        <div class="profile-avatar">
+            @Model.Username.Substring(0, 1).ToUpper()
+        </div>
+        <p class="profile-name">@Model.Username</p>
+        <span class="profile-role-badge">@Model.Role</span>
+
+        <div style="margin-top:24px;border-top:1px solid #F3F4F6;padding-top:20px;text-align:left;">
+            <div class="profile-info-row">
+                <span class="profile-info-label">Email</span>
+                <span class="profile-info-value">@Model.Email</span>
+            </div>
+            <div class="profile-info-row">
+                <span class="profile-info-label">Statut</span>
+                <span class="badge badge-green"><span class="badge-dot"></span>Actif</span>
+            </div>
+            <div class="profile-info-row">
+                <span class="profile-info-label">Rôle</span>
+                <span class="profile-info-value">@Model.Role</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Card -->
+    <div>
+        @if (Model.Role == "Patient" && Model.Patient != null)
+        {
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-user-injured"></i>
+                    Informations Patient
+                </div>
+                <div class="grid-2" style="gap:16px;">
+                    <div class="profile-info-row" style="flex-direction:column;align-items:flex-start;">
+                        <span class="profile-info-label">Nom</span>
+                        <span class="profile-info-value">@Model.Patient.Nom</span>
+                    </div>
+                    <div class="profile-info-row" style="flex-direction:column;align-items:flex-start;">
+                        <span class="profile-info-label">Prénom</span>
+                        <span class="profile-info-value">@Model.Patient.Prenom</span>
+                    </div>
+                    <div class="profile-info-row" style="flex-direction:column;align-items:flex-start;">
+                        <span class="profile-info-label">Téléphone</span>
+                        <span class="profile-info-value">@(Model.Patient.Telephone ?? "N/A")</span>
+                    </div>
+                    <div class="profile-info-row" style="flex-direction:column;align-items:flex-start;">
+                        <span class="profile-info-label">Date de naissance</span>
+                        <span class="profile-info-value">@(Model.Patient.DateNaissance?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                    </div>
+                    <div style="grid-column:span 2;" class="profile-info-row" style="flex-direction:column;align-items:flex-start;">
+                        <span class="profile-info-label">Adresse</span>
+                        <span class="profile-info-value">@(Model.Patient.Adresse ?? "N/A")</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-calendar-check"></i>
+                    Accès rapides
+                </div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <a asp-controller="RendezVous" asp-action="MesRendezVous" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-calendar-alt me-1"></i>Mes rendez-vous
+                    </a>
+                    <a asp-controller="DossierMedicals" asp-action="MonDossier" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-folder-open me-1"></i>Mon dossier
+                    </a>
+                    <a asp-controller="Factures" asp-action="MesFactures" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-receipt me-1"></i>Mes factures
+                    </a>
+                </div>
+            </div>
+        }
+        else if (Model.Role == "Medecin" && Model.Medecin != null)
+        {
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-user-md"></i>
+                    Informations Médecin
+                </div>
+                <div class="grid-2" style="gap:16px;">
+                    <div>
+                        <span class="profile-info-label">Nom complet</span>
+                        <span class="profile-info-value">Dr. @Model.Medecin.Nom @Model.Medecin.Prenom</span>
+                    </div>
+                    <div>
+                        <span class="profile-info-label">Spécialité</span>
+                        <span class="profile-info-value">@(Model.Medecin.Specialite ?? "N/A")</span>
+                    </div>
+                    <div>
+                        <span class="profile-info-label">Téléphone</span>
+                        <span class="profile-info-value">@(Model.Medecin.Telephone ?? "N/A")</span>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (Model.Role == "Secretaire" && Model.Secretaire != null)
+        {
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-headset"></i>
+                    Informations Secrétaire
+                </div>
+                <div class="grid-2" style="gap:16px;">
+                    <div>
+                        <span class="profile-info-label">Nom complet</span>
+                        <span class="profile-info-value">@Model.Secretaire.Nom @Model.Secretaire.Prenom</span>
+                    </div>
+                    <div>
+                        <span class="profile-info-label">Téléphone</span>
+                        <span class="profile-info-value">@(Model.Secretaire.Telephone ?? "N/A")</span>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-shield-alt"></i>
+                    Administrateur Système
+                </div>
+                <p style="color:#6B7280;margin:0;">Accès administrateur complet à l'ensemble du système.</p>
+                <div style="display:flex;gap:12px;margin-top:16px;">
+                    <a asp-controller="Users" asp-action="Index" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-users me-1"></i>Gestion utilisateurs
+                    </a>
+                </div>
+            </div>
+        }
+
+        <!-- Security card -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <i class="fas fa-key"></i>
+                Sécurité
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                    <p style="font-weight:600;margin:0 0 4px;font-size:.875rem;">Mot de passe</p>
+                    <p style="font-size:.8125rem;color:#6B7280;margin:0;">Dernière modification : non disponible</p>
+                </div>
+                <a asp-action="Edit" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-lock me-1"></i>Modifier
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

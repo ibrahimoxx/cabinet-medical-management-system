@@ -7,129 +7,90 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show fade-in" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+    <div class="alert alert-success"><i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]</div>
 }
 
-<div class="card fade-in">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">
-                <i class="bi bi-clipboard2-pulse me-2"></i>Consultations
-            </h4>
-            @if (role == "Medecin")
-            {
-                <a asp-action="Create" class="btn btn-primary btn-sm">
-                    <i class="bi bi-plus-circle me-2"></i>Nouvelle consultation
-                </a>
-            }
-        </div>
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Consultations</h1>
+        <p>Historique des consultations médicales</p>
     </div>
-    <div class="card-body">
-        <!-- FILTRES DE RECHERCHE -->
-        <div class="mb-4 p-3 bg-light rounded">
-            <form method="get" action="@Url.Action("Index")" class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label small text-muted">Rechercher par patient</label>
-                    <input type="text" name="searchPatient" class="form-control form-control-sm" 
-                           value="@ViewBag.SearchPatient" placeholder="Nom ou prénom du patient">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small text-muted">Date</label>
-                    <input type="date" name="date" class="form-control form-control-sm" value="@ViewBag.Date">
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary btn-sm me-2">
-                        <i class="bi bi-search me-1"></i>Rechercher
-                    </button>
-                </div>
-            </form>
-            @if (!string.IsNullOrEmpty(ViewBag.SearchPatient) || !string.IsNullOrEmpty(ViewBag.Date))
-            {
-                <div class="mt-2">
-                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-x-circle me-1"></i>Réinitialiser
-                    </a>
-                    <small class="text-muted ms-2">
-                        <i class="bi bi-funnel me-1"></i>Filtres actifs
-                    </small>
-                </div>
-            }
-        </div>
-
-        @if (Model.Any())
-        {
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            @if (role == "Secretaire")
-                            {
-                                <th>Médecin</th>
-                            }
-                            <th>Patient</th>
-                            <th>Diagnostic</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var consultation in Model)
-                        {
-                            <tr>
-                                <td>@consultation.DateConsultation.ToString("dd/MM/yyyy HH:mm")</td>
-                                @if (role == "Secretaire")
-                                {
-                                    <td>Dr. @consultation.Medecin?.Nom @consultation.Medecin?.Prenom</td>
-                                }
-                                <td><strong>@consultation.DossierMedical?.Patient?.Nom @consultation.DossierMedical?.Patient?.Prenom</strong></td>
-                                <td>@(consultation.Diagnostic?.Length > 50 ? consultation.Diagnostic.Substring(0, 50) + "..." : consultation.Diagnostic ?? "N/A")</td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@consultation.Id" class="btn btn-sm btn-info" title="Détails">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    @if (role == "Medecin")
-                                    {
-                                        <!-- EXTEND: Modifier consultation -->
-                                        <a asp-action="Edit" asp-route-id="@consultation.Id" class="btn btn-sm btn-warning" title="Modifier">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <!-- EXTEND: Imprimer consultation -->
-                                        <a asp-action="Imprimer" asp-route-id="@consultation.Id" class="btn btn-sm btn-secondary" target="_blank" title="Imprimer">
-                                            <i class="bi bi-printer"></i>
-                                        </a>
-                                        <!-- EXTEND: Créer ordonnance depuis consultation -->
-                                        <a asp-controller="Ordonnances" asp-action="Create" asp-route-consultationId="@consultation.Id" class="btn btn-sm btn-success" title="Créer ordonnance">
-                                            <i class="bi bi-prescription2"></i>
-                                        </a>
-                                        <!-- EXTEND: Supprimer consultation -->
-                                        <a asp-action="Delete" asp-route-id="@consultation.Id" class="btn btn-sm btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette consultation ?');">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="text-center py-5">
-                <i class="bi bi-clipboard2" style="font-size: 4rem; color: #ccc;"></i>
-                <p class="text-muted mt-3">Aucune consultation enregistrée.</p>
-                @if (role == "Medecin")
-                {
-                    <a asp-action="Create" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>Créer la première consultation
-                    </a>
-                }
-            </div>
-        }
-    </div>
+    @if (role == "Medecin")
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvelle consultation
+        </a>
+    }
 </div>
 
+<div class="filter-card">
+    <form method="get" action="@Url.Action("Index")">
+        <div class="input-group" style="flex:1;max-width:320px;">
+            <i class="fas fa-search input-icon"></i>
+            <input type="text" name="searchPatient" class="form-control" value="@ViewBag.SearchPatient" placeholder="Rechercher par patient…">
+        </div>
+        <input type="date" name="date" class="form-control" value="@ViewBag.Date" style="width:160px;">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filtrer</button>
+        @if (!string.IsNullOrEmpty(ViewBag.SearchPatient?.ToString()) || !string.IsNullOrEmpty(ViewBag.Date?.ToString()))
+        {
+            <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fas fa-times"></i></a>
+        }
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-card-header">
+        <h2 class="table-card-title">Toutes les consultations</h2>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    @if (role == "Secretaire") { <th>Médecin</th> }
+                    <th>Patient</th>
+                    <th>Diagnostic</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td style="font-weight:700;white-space:nowrap;">@c.DateConsultation.ToString("dd/MM/yyyy HH:mm")</td>
+                        @if (role == "Secretaire") { <td>Dr. @c.Medecin?.Nom @c.Medecin?.Prenom</td> }
+                        <td style="font-weight:600;">@c.DossierMedical?.Patient?.Nom @c.DossierMedical?.Patient?.Prenom</td>
+                        <td style="color:#6B7280;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                            @(c.Diagnostic?.Length > 60 ? c.Diagnostic.Substring(0, 60) + "…" : c.Diagnostic ?? "N/A")
+                        </td>
+                        <td style="text-align:right;">
+                            <div style="display:flex;justify-content:flex-end;gap:4px;">
+                                <a asp-action="Details" asp-route-id="@c.Id" class="btn-tbl-action" title="Détails"><i class="fas fa-eye"></i></a>
+                                @if (role == "Medecin")
+                                {
+                                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn-tbl-action" title="Modifier"><i class="fas fa-edit"></i></a>
+                                    <a asp-action="Imprimer" asp-route-id="@c.Id" class="btn-tbl-action" target="_blank" title="Imprimer"><i class="fas fa-print"></i></a>
+                                    <a asp-controller="Ordonnances" asp-action="Create" asp-route-consultationId="@c.Id" class="btn-tbl-action" title="Créer ordonnance"><i class="fas fa-prescription"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@c.Id" class="btn-tbl-action danger" title="Supprimer"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette consultation ?');"><i class="fas fa-trash"></i></a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" style="text-align:center;padding:48px;color:#9CA3AF;">
+                            <i class="fas fa-clipboard" style="font-size:2rem;display:block;margin-bottom:12px;color:#E5E7EB;"></i>
+                            <p style="margin:0 0 12px;">Aucune consultation enregistrée</p>
+                            @if (role == "Medecin") {
+                                <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Créer une consultation</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

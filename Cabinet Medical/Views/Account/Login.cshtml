@@ -1,199 +1,283 @@
 ﻿@{
-    ViewData["Title"] = "Login";
-    Layout = null; // login page has no sidebar
+    ViewData["Title"] = "Connexion";
+    Layout = null;
 }
-
 <!DOCTYPE html>
-<html lang="fr">
+<html class="light" lang="fr">
 <head>
     <meta charset="utf-8" />
     <title>Connexion | Cabinet Médical</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <!-- Animate -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Modern CSS -->
-    <link rel="stylesheet" href="~/css/modern.css" />
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            display: flex;
+            background: #F8FAFD;
+        }
+
+        /* ─── LEFT PANEL ─── */
+        .auth-left {
+            width: 45%;
+            max-width: 560px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 48px 64px;
+            min-height: 100vh;
+        }
+
+        .logo-box {
+            width: 56px; height: 56px;
+            background: #0f52ba;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 1.5rem;
+            box-shadow: 0 8px 24px rgba(15,82,186,.4);
+            margin-bottom: 24px;
+        }
+        .brand-title { font-size: 1.375rem; font-weight: 700; color: #0F172A; margin: 0 0 4px; }
+        .brand-sub   { font-size: 0.875rem; color: #64748B; font-weight: 500; margin: 0 0 48px; }
+        .auth-heading { font-size: 1.875rem; font-weight: 700; color: #1E293B; margin: 0 0 6px; }
+        .auth-sub     { font-size: 0.875rem; color: #64748B; margin: 0 0 32px; }
+
+        /* Error */
+        .error-box {
+            background: #FFEBEE; border-left: 4px solid #E53935;
+            padding: 12px 16px; border-radius: 8px;
+            color: #C62828; font-size: 0.875rem;
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.8125rem; font-weight: 600; color: #334155; margin-bottom: 6px; }
+        .input-wrap { position: relative; }
+        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94A3B8; font-size: 0.9375rem; pointer-events: none; }
+        .form-input {
+            width: 100%;
+            padding: 14px 14px 14px 46px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9375rem;
+            color: #0F172A;
+            outline: none;
+            transition: all .2s;
+        }
+        .form-input:focus { border-color: #0f52ba; box-shadow: 0 0 0 3px rgba(15,82,186,.12); background: #fff; }
+
+        /* Remember row */
+        .remember-row { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .remember-row input { accent-color: #0f52ba; width: 16px; height: 16px; }
+        .remember-row label { font-size: 0.875rem; color: #475569; cursor: pointer; }
+
+        /* Submit */
+        .auth-btn {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, #0f52ba, #1d4ed8);
+            color: #fff; border: none; border-radius: 12px;
+            font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 16px rgba(15,82,186,.35);
+            transition: all .2s;
+        }
+        .auth-btn:hover { box-shadow: 0 8px 24px rgba(15,82,186,.45); transform: translateY(-1px); }
+        .auth-btn:active { transform: scale(.98); }
+
+        /* Divider + register */
+        .auth-divider { border: none; border-top: 1px solid #F1F5F9; margin: 28px 0 20px; }
+        .auth-register { text-align: center; font-size: 0.875rem; color: #64748B; }
+        .auth-register a { color: #0f52ba; font-weight: 700; text-decoration: none; }
+        .auth-register a:hover { text-decoration: underline; }
+
+        /* Secure note */
+        .secure-note { display: flex; align-items: center; gap: 8px; font-size: 0.6875rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: .07em; }
+        .secure-note i { color: #22C55E; }
+
+        /* ─── RIGHT PANEL ─── */
+        .auth-right {
+            flex: 1;
+            background: #0F172A;
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            position: relative;
-            overflow: hidden;
+            padding: 60px 48px;
         }
-
-        body::before {
+        .auth-right::before {
             content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: move 20s linear infinite;
-            opacity: 0.3;
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(15,82,186,.35), #0F172A);
         }
-
-        @@keyframes move {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        .auth-right-content {
+            position: relative; z-index: 1;
+            width: 100%; max-width: 480px;
+            display: flex; flex-direction: column; gap: 24px;
         }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+        .glass-card {
+            background: rgba(255,255,255,.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.1);
             border-radius: 24px;
-            width: 100%;
-            max-width: 450px;
-            padding: 40px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 28px 32px;
+            transition: transform .3s;
         }
-
-        .login-card h3 {
-            font-weight: 700;
-            color: #1e40af;
-            margin-bottom: 8px;
+        .glass-card:hover { transform: scale(1.01); }
+        .glass-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .glass-card-header i { color: #60A5FA; font-size: 1.125rem; }
+        .glass-card-header h3 { font-size: 1.0625rem; font-weight: 700; color: #fff; margin: 0; }
+        .glass-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+        .glass-list li { display: flex; gap: 12px; align-items: flex-start; }
+        .glass-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+        .glass-dot.blue   { background: #60A5FA; }
+        .glass-dot.green  { background: #4ADE80; }
+        .glass-dot.yellow { background: #FBBF24; }
+        .glass-list-text strong { display: block; font-size: 0.875rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
+        .glass-list-text span   { font-size: 0.8125rem; color: rgba(255,255,255,.65); }
+        .loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .loc-info p { font-size: 0.8125rem; color: rgba(255,255,255,.75); display: flex; align-items: flex-start; gap: 8px; margin: 0 0 10px; }
+        .loc-info p i { color: rgba(255,255,255,.5); margin-top: 2px; flex-shrink: 0; }
+        .loc-map {
+            height: 120px; border-radius: 12px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.08);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
         }
-
-        .form-control, .form-select {
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 2px solid #e5e7eb;
-            transition: all 0.3s ease;
-            font-size: 15px;
+        .loc-map::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,.15) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-            outline: none;
+        .loc-pin {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; align-items: center;
         }
+        .ping { width: 24px; height: 24px; border-radius: 50%; background: #0f52ba; animation: ping 1.2s ease-out infinite; opacity: .6; position: absolute; }
+        @@keyframes ping { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.5); opacity: 0; } }
+        .loc-pin i { position: relative; color: #60A5FA; font-size: 1.5rem; }
 
-        .input-group-text {
-            background: #f3f4f6;
-            border: 2px solid #e5e7eb;
-            border-right: none;
-            border-radius: 12px 0 0 12px;
-        }
-
-        .input-group .form-control {
-            border-left: none;
-            border-radius: 0 12px 12px 0;
-        }
-
-        .input-group .form-control:focus {
-            border-left: 2px solid #2563eb;
-        }
-
-        .btn-login {
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 600;
-            font-size: 16px;
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            border: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn-register {
-            border-radius: 12px;
-            padding: 14px;
-            font-weight: 600;
-            font-size: 16px;
-            background: white;
-            border: 2px solid #2563eb;
-            color: #2563eb;
-            transition: all 0.3s ease;
-        }
-
-        .btn-register:hover {
-            background: #2563eb;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .logo {
-            font-size: 60px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-        }
-
-        .alert {
-            border-radius: 12px;
-            border: none;
+        @@media (max-width: 768px) {
+            .auth-right { display: none; }
+            .auth-left  { width: 100%; max-width: 100%; padding: 32px 24px; }
         }
     </style>
 </head>
-
 <body>
+    <!-- LEFT: Login Form -->
+    <div class="auth-left">
+        <div>
+            <!-- Brand -->
+            <div class="logo-box"><i class="fas fa-stethoscope"></i></div>
+            <h1 class="brand-title">Gestion Cabinet Médical</h1>
+            <p class="brand-sub">Professional Healthcare Portal</p>
 
-<div class="login-card animate__animated animate__fadeInUp">
-    <div class="text-center mb-4">
-        <div class="logo">🏥</div>
-        <h3>Cabinet Médical</h3>
+            <!-- Heading -->
+            <h2 class="auth-heading">Welcome Back</h2>
+            <p class="auth-sub">Please enter your professional credentials</p>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="error-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @ViewBag.Error
+                </div>
+            }
+
+            <form method="post">
+                <div class="form-group">
+                    <label class="form-label">Email or Username</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" name="username" class="form-input" placeholder="dr.smith@clinic.com" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password" class="form-input" placeholder="••••••••" required />
+                    </div>
+                </div>
+                <div class="remember-row">
+                    <input type="checkbox" id="remember" name="remember" />
+                    <label for="remember">Stay signed in for 30 days</label>
+                </div>
+                <button type="submit" class="auth-btn">
+                    <span>Secure Sign In</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <hr class="auth-divider" />
+            <p class="auth-register">
+                Don't have an account? <a asp-action="Register">Register Clinic</a>
+            </p>
+        </div>
+
+        <!-- Secure note -->
+        <div class="secure-note">
+            <i class="fas fa-shield-halved"></i>
+            End-to-End Encrypted Access
+        </div>
     </div>
 
-    @if (ViewBag.Error != null)
-    {
-        <div class="alert alert-danger">
-            @ViewBag.Error
-        </div>
-    }
+    <!-- RIGHT: Info Panel -->
+    <div class="auth-right">
+        <div class="auth-right-content">
+            <!-- Announcements card -->
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <i class="fas fa-bullhorn"></i>
+                    <h3>Latest Announcements</h3>
+                </div>
+                <ul class="glass-list">
+                    <li>
+                        <div class="glass-dot blue"></div>
+                        <div class="glass-list-text">
+                            <strong>Holiday Hours Update</strong>
+                            <span>The clinic will be closed on Dec 25th and Jan 1st.</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="glass-dot green"></div>
+                        <div class="glass-list-text">
+                            <strong>New Specialist Joined</strong>
+                            <span>Welcome Dr. Elena Vance, Cardiology Department.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
 
-    <form method="post">
-        <div class="mb-3">
-            <label class="form-label">Nom d'utilisateur</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" name="username" class="form-control" required />
+            <!-- Location card -->
+            <div class="glass-card">
+                <div class="glass-card-header">
+                    <i class="fas fa-location-dot"></i>
+                    <h3>Our Location</h3>
+                </div>
+                <div class="loc-grid">
+                    <div class="loc-info">
+                        <p><i class="fas fa-map"></i>123 Medical Plaza, Avenue de France<br>75013 Paris, France</p>
+                        <p><i class="fas fa-phone"></i>+33 (0) 1 23 45 67 89</p>
+                    </div>
+                    <div class="loc-map">
+                        <div class="loc-pin">
+                            <div class="ping"></div>
+                            <i class="fas fa-location-dot"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="mb-4">
-            <label class="form-label">Mot de passe</label>
-            <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password" class="form-control" required />
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100 btn-login">
-            <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
-        </button>
-    </form>
-
-    <div class="text-center mt-4">
-        <p class="text-muted mb-2">Pas encore de compte ?</p>
-        <a asp-action="Register" class="btn btn-register w-100">
-            <i class="bi bi-person-plus me-2"></i> S'inscrire
-        </a>
     </div>
-
-    <div class="text-center mt-4 text-muted small">
-        © 2025 Cabinet Médical
-    </div>
-</div>
-
 </body>
 </html>

@@ -6,162 +6,108 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show fade-in" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+    <div class="alert alert-success"><i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]</div>
 }
 
-<div class="card fade-in">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">
-                <i class="bi bi-calendar-check me-2"></i>Rendez-vous
-            </h4>
-            <a asp-action="Create" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-circle me-2"></i>Nouveau rendez-vous
-            </a>
-        </div>
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Rendez-vous</h1>
+        <p>Planning et gestion des rendez-vous</p>
     </div>
-    <div class="card-body">
-        <!-- FILTRES DE RECHERCHE -->
-        <div class="mb-4 p-3 bg-light rounded">
-            <form method="get" action="@Url.Action("Index")" class="row g-3">
-                <div class="col-md-3">
-                    <label class="form-label small text-muted">Rechercher par patient</label>
-                    <input type="text" name="searchPatient" class="form-control form-control-sm" 
-                           value="@ViewBag.SearchPatient" placeholder="Nom ou prénom du patient">
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label small text-muted">Rechercher par médecin</label>
-                    <input type="text" name="searchMedecin" class="form-control form-control-sm" 
-                           value="@ViewBag.SearchMedecin" placeholder="Nom du médecin">
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small text-muted">Statut</label>
-                    <select name="statut" class="form-select form-select-sm">
-                        <option value="">Tous</option>
-                        @if (ViewBag.Statut == "Planifie")
-                        {
-                            <option value="Planifie" selected>Planifié</option>
-                        }
-                        else
-                        {
-                            <option value="Planifie">Planifié</option>
-                        }
-                        @if (ViewBag.Statut == "Termine")
-                        {
-                            <option value="Termine" selected>Terminé</option>
-                        }
-                        else
-                        {
-                            <option value="Termine">Terminé</option>
-                        }
-                        @if (ViewBag.Statut == "Annule")
-                        {
-                            <option value="Annule" selected>Annulé</option>
-                        }
-                        else
-                        {
-                            <option value="Annule">Annulé</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label small text-muted">Date</label>
-                    <input type="date" name="date" class="form-control form-control-sm" value="@ViewBag.Date">
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary btn-sm me-2 w-100">
-                        <i class="bi bi-search me-1"></i>Rechercher
-                    </button>
-                </div>
-            </form>
-            @if (!string.IsNullOrEmpty(ViewBag.SearchPatient) || !string.IsNullOrEmpty(ViewBag.SearchMedecin) || !string.IsNullOrEmpty(ViewBag.Statut) || !string.IsNullOrEmpty(ViewBag.Date))
-            {
-                <div class="mt-2">
-                    <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-x-circle me-1"></i>Réinitialiser les filtres
-                    </a>
-                    <small class="text-muted ms-2">
-                        <i class="bi bi-funnel me-1"></i>Filtres actifs
-                    </small>
-                </div>
-            }
-        </div>
-
-        @if (Model.Any())
-        {
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Heure</th>
-                            <th>Patient</th>
-                            <th>Médecin</th>
-                            <th>Motif</th>
-                            <th>Statut</th>
-                            <th style="width: 200px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var rdv in Model)
-                        {
-                            <tr>
-                                <td>@rdv.DateRdv.ToString("dd/MM/yyyy")</td>
-                                <td>@rdv.HeureRdv.ToString(@"hh\:mm")</td>
-                                <td><strong>@rdv.Patient?.Nom @rdv.Patient?.Prenom</strong></td>
-                                <td>Dr. @rdv.Medecin?.Nom @rdv.Medecin?.Prenom</td>
-                                <td>@(rdv.Motif ?? "N/A")</td>
-                                <td>
-                                    @if (rdv.Statut == "Planifie")
-                                    {
-                                        <span class="badge badge-info">Planifié</span>
-                                    }
-                                    else if (rdv.Statut == "Termine")
-                                    {
-                                        <span class="badge badge-success">Terminé</span>
-                                    }
-                                    else if (rdv.Statut == "Annule")
-                                    {
-                                        <span class="badge badge-danger">Annulé</span>
-                                    }
-                                </td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@rdv.Id" class="btn btn-sm btn-info" title="Détails">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <!-- EXTEND: Modifier rendez-vous (Secrétaire) -->
-                                    <a asp-action="Edit" asp-route-id="@rdv.Id" class="btn btn-sm btn-warning" title="Modifier">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <!-- EXTEND: Annuler rendez-vous (Secrétaire) -->
-                                    @if (rdv.Statut == "Planifie")
-                                    {
-                                        <a asp-action="Annuler" asp-route-id="@rdv.Id" class="btn btn-sm btn-danger"
-                                           onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?');" title="Annuler">
-                                            <i class="bi bi-x-circle"></i> Annuler
-                                        </a>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="text-center py-5">
-                <i class="bi bi-calendar-x" style="font-size: 4rem; color: #ccc;"></i>
-                <p class="text-muted mt-3">Aucun rendez-vous enregistré.</p>
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>Planifier le premier rendez-vous
-                </a>
-            </div>
-        }
-    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-calendar-plus"></i> Nouveau rendez-vous
+    </a>
 </div>
 
+<div class="filter-card">
+    <form method="get" action="@Url.Action("Index")">
+        <div class="input-group" style="flex:1;max-width:220px;">
+            <i class="fas fa-user input-icon"></i>
+            <input type="text" name="searchPatient" class="form-control" value="@ViewBag.SearchPatient" placeholder="Patient…">
+        </div>
+        <div class="input-group" style="width:200px;">
+            <i class="fas fa-user-md input-icon"></i>
+            <input type="text" name="searchMedecin" class="form-control" value="@ViewBag.SearchMedecin" placeholder="Médecin…">
+        </div>
+        <select name="statut" class="form-control" style="width:160px;">
+            <option value="">Tous les statuts</option>
+            @if (ViewBag.Statut == "Planifie") { <option value="Planifie" selected>Planifié</option> }
+            else { <option value="Planifie">Planifié</option> }
+            @if (ViewBag.Statut == "Termine") { <option value="Termine" selected>Terminé</option> }
+            else { <option value="Termine">Terminé</option> }
+            @if (ViewBag.Statut == "Annule") { <option value="Annule" selected>Annulé</option> }
+            else { <option value="Annule">Annulé</option> }
+        </select>
+        <input type="date" name="date" class="form-control" value="@ViewBag.Date" style="width:160px;">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Rechercher</button>
+        @if (!string.IsNullOrEmpty(ViewBag.SearchPatient?.ToString()) || !string.IsNullOrEmpty(ViewBag.SearchMedecin?.ToString())
+          || !string.IsNullOrEmpty(ViewBag.Statut?.ToString()) || !string.IsNullOrEmpty(ViewBag.Date?.ToString()))
+        {
+            <a href="@Url.Action("Index")" class="btn btn-secondary"><i class="fas fa-times"></i> Effacer</a>
+        }
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-card-header">
+        <h2 class="table-card-title">Tous les rendez-vous</h2>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Heure</th>
+                    <th>Patient</th>
+                    <th>Médecin</th>
+                    <th>Motif</th>
+                    <th>Statut</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rdv in Model)
+                {
+                    <tr>
+                        <td style="font-weight:700;">@rdv.DateRdv.ToString("dd/MM/yyyy")</td>
+                        <td style="color:#6B7280;">@rdv.HeureRdv.ToString(@"hh\:mm")</td>
+                        <td style="font-weight:600;">@rdv.Patient?.Nom @rdv.Patient?.Prenom</td>
+                        <td>Dr. @rdv.Medecin?.Nom @rdv.Medecin?.Prenom</td>
+                        <td style="color:#6B7280;">@(rdv.Motif ?? "N/A")</td>
+                        <td>
+                            @if (rdv.Statut == "Planifie")
+                            { <span class="badge badge-blue"><span class="badge-dot"></span>Planifié</span> }
+                            else if (rdv.Statut == "Termine")
+                            { <span class="badge badge-green"><span class="badge-dot"></span>Terminé</span> }
+                            else if (rdv.Statut == "Annule")
+                            { <span class="badge badge-red"><span class="badge-dot"></span>Annulé</span> }
+                        </td>
+                        <td style="text-align:right;">
+                            <div style="display:flex;justify-content:flex-end;gap:4px;">
+                                <a asp-action="Details" asp-route-id="@rdv.Id" class="btn-tbl-action" title="Détails"><i class="fas fa-eye"></i></a>
+                                <a asp-action="Edit" asp-route-id="@rdv.Id" class="btn-tbl-action" title="Modifier"><i class="fas fa-edit"></i></a>
+                                @if (rdv.Statut == "Planifie")
+                                {
+                                    <a asp-action="Annuler" asp-route-id="@rdv.Id" class="btn-tbl-action danger"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?');" title="Annuler">
+                                        <i class="fas fa-times-circle"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:48px;color:#9CA3AF;">
+                            <i class="fas fa-calendar-times" style="font-size:2rem;display:block;margin-bottom:12px;color:#E5E7EB;"></i>
+                            <p style="margin:0 0 12px;">Aucun rendez-vous trouvé</p>
+                            <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-calendar-plus me-1"></i>Planifier un RDV</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

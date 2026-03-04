@@ -6,84 +6,70 @@
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show fade-in" role="alert">
-        <i class="bi bi-check-circle-fill me-2"></i>
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+    <div class="alert alert-success"><i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]</div>
 }
 
-<div class="card fade-in">
-    <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">
-                <i class="bi bi-receipt me-2"></i>Factures
-            </h4>
-            <a asp-action="Create" class="btn btn-primary btn-sm">
-                <i class="bi bi-plus-circle me-2"></i>Nouvelle facture
-            </a>
-        </div>
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Facturation</h1>
+        <p>Suivi de la facturation et des paiements</p>
     </div>
-    <div class="card-body">
-        @if (Model.Any())
-        {
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>N°</th>
-                            <th>Date</th>
-                            <th>Patient</th>
-                            <th>Consultation</th>
-                            <th>Montant</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var facture in Model)
-                        {
-                            <tr>
-                                <td><strong>#@facture.Id</strong></td>
-                                <td>@facture.DateFacture.ToString("dd/MM/yyyy")</td>
-                                <td><strong>@facture.Patient?.Nom @facture.Patient?.Prenom</strong></td>
-                                <td>@facture.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</td>
-                                <td><strong>@facture.Montant.ToString("C")</strong></td>
-                                <td>
-                                    @if (facture.Statut == "Payee")
-                                    {
-                                        <span class="badge badge-success">Payée</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge badge-danger">Non payée</span>
-                                    }
-                                </td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@facture.Id" class="btn btn-sm btn-info" title="Détails">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <!-- EXTEND: Imprimer facture -->
-                                    <a asp-action="Imprimer" asp-route-id="@facture.Id" class="btn btn-sm btn-secondary" target="_blank" title="Imprimer">
-                                        <i class="bi bi-printer"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-        else
-        {
-            <div class="text-center py-5">
-                <i class="bi bi-receipt" style="font-size: 4rem; color: #ccc;"></i>
-                <p class="text-muted mt-3">Aucune facture enregistrée.</p>
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>Créer la première facture
-                </a>
-            </div>
-        }
-    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nouvelle facture
+    </a>
 </div>
 
+<div class="table-card">
+    <div class="table-card-header">
+        <h2 class="table-card-title">Toutes les factures</h2>
+    </div>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Consultation</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model)
+                {
+                    <tr>
+                        <td><span style="font-weight:700;color:#1E88E5;">#@f.Id</span></td>
+                        <td style="white-space:nowrap;">@f.DateFacture.ToString("dd/MM/yyyy")</td>
+                        <td style="font-weight:600;">@f.Patient?.Nom @f.Patient?.Prenom</td>
+                        <td style="color:#6B7280;">@f.Consultation?.DateConsultation.ToString("dd/MM/yyyy")</td>
+                        <td style="font-weight:700;">@f.Montant.ToString("C")</td>
+                        <td>
+                            @if (f.Statut == "Payee")
+                            { <span class="badge badge-green"><span class="badge-dot"></span>Payée</span> }
+                            else
+                            { <span class="badge badge-red"><span class="badge-dot"></span>Non payée</span> }
+                        </td>
+                        <td style="text-align:right;">
+                            <div style="display:flex;justify-content:flex-end;gap:4px;">
+                                <a asp-action="Details" asp-route-id="@f.Id" class="btn-tbl-action" title="Détails"><i class="fas fa-eye"></i></a>
+                                <a asp-action="Imprimer" asp-route-id="@f.Id" class="btn-tbl-action" target="_blank" title="Imprimer"><i class="fas fa-print"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:48px;color:#9CA3AF;">
+                            <i class="fas fa-receipt" style="font-size:2rem;display:block;margin-bottom:12px;color:#E5E7EB;"></i>
+                            <p style="margin:0 0 12px;">Aucune facture enregistrée</p>
+                            <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Créer une facture</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

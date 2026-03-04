@@ -1,214 +1,284 @@
 ﻿@model Cabinet_Medical.Models.User
 
 @{
-    ViewData["Title"] = "Ajouter utilisateur";
+    ViewData["Title"] = "Ajouter un utilisateur";
 }
 
-<div class="card p-4">
-    <h4 class="mb-4">
-        <i class="bi bi-person-plus"></i> Ajouter utilisateur
-    </h4>
-
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    <li>@error.ErrorMessage</li>
-                }
-            </ul>
-        </div>
-    }
-
-    <form asp-action="Create" method="post">
-        @Html.AntiForgeryToken()
-
-        <!-- USERNAME -->
-        <div class="mb-3">
-            <label asp-for="Username" class="form-label">Nom d'utilisateur</label>
-            <input asp-for="Username" class="form-control" />
-            <span asp-validation-for="Username" class="text-danger"></span>
-        </div>
-
-        <!-- EMAIL -->
-        <div class="mb-3">
-            <label asp-for="Email" class="form-label">Email</label>
-            <input asp-for="Email" type="email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <!-- PASSWORD -->
-        <div class="mb-3">
-            <label asp-for="PasswordHash" class="form-label">Mot de passe</label>
-            <input asp-for="PasswordHash" type="password" class="form-control" />
-            <span asp-validation-for="PasswordHash" class="text-danger"></span>
-            <small class="text-muted">
-                (mot de passe en clair pour l'instant)
-            </small>
-        </div>
-
-        <!-- ROLE -->
-        <div class="mb-3">
-            <label asp-for="Role" class="form-label">Rôle</label>
-            <select asp-for="Role" class="form-select" id="RoleSelect" required>
-                <option value="">-- Sélectionner un rôle --</option>
-                <option value="Admin">Admin</option>
-                <option value="Secretaire">Secrétaire</option>
-                <option value="Medecin">Médecin</option>
-                <option value="Patient">Patient</option>
-            </select>
-            <span asp-validation-for="Role" class="text-danger"></span>
-        </div>
-
-        <!-- CHAMPS PATIENT -->
-        <div id="PatientFields" style="display: none;">
-            <h5 class="mb-3 mt-4">Informations du Patient</h5>
-            
-            <div class="mb-3">
-                <label for="PatientNom" class="form-label">Nom <span class="text-danger">*</span></label>
-                <input type="text" id="PatientNom" name="PatientNom" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="PatientPrenom" class="form-label">Prénom <span class="text-danger">*</span></label>
-                <input type="text" id="PatientPrenom" name="PatientPrenom" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="PatientDateNaissance" class="form-label">Date de naissance</label>
-                <input type="date" id="PatientDateNaissance" name="PatientDateNaissance" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="PatientAdresse" class="form-label">Adresse <span class="text-danger">*</span></label>
-                <input type="text" id="PatientAdresse" name="PatientAdresse" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="PatientTelephone" class="form-label">Téléphone <span class="text-danger">*</span></label>
-                <input type="text" id="PatientTelephone" name="PatientTelephone" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="PatientAntecedents" class="form-label">Antécédents médicaux <span class="text-danger">*</span></label>
-                <textarea id="PatientAntecedents" name="PatientAntecedents" class="form-control" rows="3"></textarea>
-            </div>
-        </div>
-
-        <!-- CHAMPS MEDECIN -->
-        <div id="MedecinFields" style="display: none;">
-            <h5 class="mb-3 mt-4">Informations du Médecin</h5>
-            
-            <div class="mb-3">
-                <label for="MedecinNom" class="form-label">Nom <span class="text-danger">*</span></label>
-                <input type="text" id="MedecinNom" name="MedecinNom" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="MedecinPrenom" class="form-label">Prénom <span class="text-danger">*</span></label>
-                <input type="text" id="MedecinPrenom" name="MedecinPrenom" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="MedecinSpecialite" class="form-label">Spécialité <span class="text-danger">*</span></label>
-                <input type="text" id="MedecinSpecialite" name="MedecinSpecialite" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="MedecinTelephone" class="form-label">Téléphone <span class="text-danger">*</span></label>
-                <input type="text" id="MedecinTelephone" name="MedecinTelephone" class="form-control" />
-            </div>
-        </div>
-
-        <!-- CHAMPS SECRETAIRE -->
-        <div id="SecretaireFields" style="display: none;">
-            <h5 class="mb-3 mt-4">Informations du Secrétaire</h5>
-            
-            <div class="mb-3">
-                <label for="SecretaireNom" class="form-label">Nom <span class="text-danger">*</span></label>
-                <input type="text" id="SecretaireNom" name="SecretaireNom" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="SecretairePrenom" class="form-label">Prénom <span class="text-danger">*</span></label>
-                <input type="text" id="SecretairePrenom" name="SecretairePrenom" class="form-control" />
-            </div>
-
-            <div class="mb-3">
-                <label for="SecretaireTelephone" class="form-label">Téléphone <span class="text-danger">*</span></label>
-                <input type="text" id="SecretaireTelephone" name="SecretaireTelephone" class="form-control" />
-            </div>
-        </div>
-
-        <!-- STATUS -->
-        <div class="form-check mb-4">
-            <input asp-for="IsActive" class="form-check-input" checked />
-            <label asp-for="IsActive" class="form-check-label">Utilisateur actif</label>
-        </div>
-
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-check-circle"></i> Créer
-        </button>
-
-        <a asp-action="Index" class="btn btn-secondary ms-2">
-            Annuler
-        </a>
-    </form>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Créer un Nouvel Utilisateur</h1>
+        <p>Remplissez les informations ci-dessous pour ajouter un membre au cabinet</p>
+    </div>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Retour
+    </a>
 </div>
 
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        <ul class="mb-0 ps-3">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <!-- Section 1: Role Selection (matching creation d'utilisateur reference) -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-id-badge"></i>
+            Rôle de l'utilisateur
+        </div>
+        <div class="grid-3">
+            <label style="cursor:pointer;">
+                <input type="radio" name="Role" value="Medecin" id="roleMedecin"
+                       style="display:none;" class="role-radio"
+                       @(Model?.Role == "Medecin" ? "checked" : string.Empty) />
+                <div class="role-card" id="roleCardMedecin">
+                    <i class="fas fa-stethoscope" style="color:#1E88E5;font-size:1.5rem;margin-bottom:8px;"></i>
+                    <div style="font-weight:700;">Médecin</div>
+                    <div style="font-size:.75rem;color:#6B7280;">Praticien de santé</div>
+                </div>
+            </label>
+            <label style="cursor:pointer;">
+                <input type="radio" name="Role" value="Secretaire" id="roleSecretaire"
+                       style="display:none;" class="role-radio"
+                       @(Model?.Role == "Secretaire" ? "checked" : string.Empty) />
+                <div class="role-card" id="roleCardSecretaire">
+                    <i class="fas fa-headset" style="color:#1E88E5;font-size:1.5rem;margin-bottom:8px;"></i>
+                    <div style="font-weight:700;">Secrétaire</div>
+                    <div style="font-size:.75rem;color:#6B7280;">Accueil et planning</div>
+                </div>
+            </label>
+            <label style="cursor:pointer;">
+                <input type="radio" name="Role" value="Patient" id="rolePatient"
+                       style="display:none;" class="role-radio"
+                       @(Model?.Role == "Patient" ? "checked" : string.Empty) />
+                <div class="role-card" id="roleCardPatient">
+                    <i class="fas fa-user" style="color:#1E88E5;font-size:1.5rem;margin-bottom:8px;"></i>
+                    <div style="font-weight:700;">Patient</div>
+                    <div style="font-size:.75rem;color:#6B7280;">Accès espace santé</div>
+                </div>
+            </label>
+        </div>
+        <!-- Hidden select for model binding -->
+        <select asp-for="Role" class="form-control" id="RoleSelect" style="display:none;">
+            <option value="">-- Sélectionner un rôle --</option>
+            <option value="Admin">Admin</option>
+            <option value="Secretaire">Secrétaire</option>
+            <option value="Medecin">Médecin</option>
+            <option value="Patient">Patient</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger" style="font-size:.8rem;"></span>
+    </div>
+
+    <!-- Section 2: Account Credentials -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-key"></i>
+            Paramètres du Compte
+        </div>
+        <div class="grid-2">
+            <div>
+                <label asp-for="Username" class="form-label">Nom d'utilisateur <span style="color:#E53935;">*</span></label>
+                <input asp-for="Username" class="form-control" placeholder="ex: dr.dupont" />
+                <span asp-validation-for="Username" class="text-danger" style="font-size:.8rem;"></span>
+            </div>
+            <div>
+                <label asp-for="Email" class="form-label">Email professionnel <span style="color:#E53935;">*</span></label>
+                <input asp-for="Email" type="email" class="form-control" placeholder="jean.dupont@cabinet.com" />
+                <span asp-validation-for="Email" class="text-danger" style="font-size:.8rem;"></span>
+            </div>
+            <div>
+                <label asp-for="PasswordHash" class="form-label">Mot de passe <span style="color:#E53935;">*</span></label>
+                <input asp-for="PasswordHash" type="password" class="form-control" />
+                <span asp-validation-for="PasswordHash" class="text-danger" style="font-size:.8rem;"></span>
+            </div>
+            <div style="display:flex;align-items:flex-end;">
+                <div style="padding:10px 14px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:0.375rem;width:100%;display:flex;align-items:center;gap:10px;">
+                    <input asp-for="IsActive" class="form-check-input" type="checkbox" checked style="width:18px;height:18px;" />
+                    <label asp-for="IsActive" class="form-label mb-0">Compte actif</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Fields (shown when Patient role selected) -->
+    <div id="PatientFields" style="display:none;">
+        <div class="form-section">
+            <div class="form-section-header">
+                <i class="fas fa-user-injured"></i>
+                Informations Patient
+            </div>
+            <div class="grid-2">
+                <div>
+                    <label class="form-label">Nom <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="PatientNom" name="PatientNom" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Prénom <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="PatientPrenom" name="PatientPrenom" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Téléphone <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="PatientTelephone" name="PatientTelephone" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Date de naissance</label>
+                    <input type="date" id="PatientDateNaissance" name="PatientDateNaissance" class="form-control" />
+                </div>
+                <div style="grid-column:span 2;">
+                    <label class="form-label">Adresse <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="PatientAdresse" name="PatientAdresse" class="form-control" />
+                </div>
+                <div style="grid-column:span 2;">
+                    <label class="form-label">Antécédents médicaux</label>
+                    <textarea id="PatientAntecedents" name="PatientAntecedents" class="form-control" rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Médecin Fields -->
+    <div id="MedecinFields" style="display:none;">
+        <div class="form-section">
+            <div class="form-section-header">
+                <i class="fas fa-user-md"></i>
+                Informations Médecin
+            </div>
+            <div class="grid-2">
+                <div>
+                    <label class="form-label">Nom <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="MedecinNom" name="MedecinNom" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Prénom <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="MedecinPrenom" name="MedecinPrenom" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Spécialité <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="MedecinSpecialite" name="MedecinSpecialite" class="form-control" placeholder="ex: Cardiologie" />
+                </div>
+                <div>
+                    <label class="form-label">Téléphone <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="MedecinTelephone" name="MedecinTelephone" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secrétaire Fields -->
+    <div id="SecretaireFields" style="display:none;">
+        <div class="form-section">
+            <div class="form-section-header">
+                <i class="fas fa-headset"></i>
+                Informations Secrétaire
+            </div>
+            <div class="grid-2">
+                <div>
+                    <label class="form-label">Nom <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="SecretaireNom" name="SecretaireNom" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Prénom <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="SecretairePrenom" name="SecretairePrenom" class="form-control" />
+                </div>
+                <div>
+                    <label class="form-label">Téléphone <span style="color:#E53935;">*</span></label>
+                    <input type="text" id="SecretaireTelephone" name="SecretaireTelephone" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding-top:8px;">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Annuler
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Créer l'utilisateur
+        </button>
+    </div>
+
+</form>
+
+<style>
+    .role-card {
+        padding: 16px;
+        border: 2px solid #E5E7EB;
+        border-radius: 12px;
+        text-align: center;
+        transition: all .2s;
+    }
+    .role-card:hover { border-color: #93C5FD; background: #F0F9FF; }
+    .role-card.selected { border-color: #1E88E5; background: #EBF4FF; }
+</style>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const roleSelect = document.getElementById('RoleSelect');
             const patientFields = document.getElementById('PatientFields');
             const medecinFields = document.getElementById('MedecinFields');
             const secretaireFields = document.getElementById('SecretaireFields');
+            const radioInputs = document.querySelectorAll('.role-radio');
+            const roleCards = document.querySelectorAll('.role-card');
+
+            // Radio card selection
+            radioInputs.forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    roleSelect.value = this.value;
+                    roleCards.forEach(c => c.classList.remove('selected'));
+                    this.parentElement.querySelector('.role-card').classList.add('selected');
+                    toggleRoleFields();
+                });
+                // Initialize from checked state
+                if (radio.checked) {
+                    roleSelect.value = radio.value;
+                    radio.parentElement.querySelector('.role-card').classList.add('selected');
+                }
+            });
 
             function toggleRoleFields() {
-                const selectedRole = roleSelect.value;
-                
-                // Cacher tous les champs
-                patientFields.style.display = 'none';
-                medecinFields.style.display = 'none';
-                secretaireFields.style.display = 'none';
-                
-                // Désactiver les champs requis
-                document.querySelectorAll('#PatientFields input[required], #PatientFields textarea[required]').forEach(el => {
-                    el.removeAttribute('required');
-                });
-                document.querySelectorAll('#MedecinFields input[required]').forEach(el => {
-                    el.removeAttribute('required');
-                });
-                document.querySelectorAll('#SecretaireFields input[required]').forEach(el => {
-                    el.removeAttribute('required');
-                });
+                const role = roleSelect.value;
+                patientFields.style.display    = role === 'Patient'    ? 'block' : 'none';
+                medecinFields.style.display    = role === 'Medecin'    ? 'block' : 'none';
+                secretaireFields.style.display = role === 'Secretaire' ? 'block' : 'none';
 
-                // Afficher et activer les champs selon le rôle
-                if (selectedRole === 'Patient') {
-                    patientFields.style.display = 'block';
-                    document.getElementById('PatientNom').required = true;
-                    document.getElementById('PatientPrenom').required = true;
-                    document.getElementById('PatientAdresse').required = true;
-                    document.getElementById('PatientTelephone').required = true;
-                    document.getElementById('PatientAntecedents').required = true;
-                } else if (selectedRole === 'Medecin') {
-                    medecinFields.style.display = 'block';
-                    document.getElementById('MedecinNom').required = true;
-                    document.getElementById('MedecinPrenom').required = true;
-                    document.getElementById('MedecinSpecialite').required = true;
-                    document.getElementById('MedecinTelephone').required = true;
-                } else if (selectedRole === 'Secretaire') {
-                    secretaireFields.style.display = 'block';
-                    document.getElementById('SecretaireNom').required = true;
-                    document.getElementById('SecretairePrenom').required = true;
-                    document.getElementById('SecretaireTelephone').required = true;
+                document.querySelectorAll('#PatientFields input, #PatientFields textarea').forEach(el => el.removeAttribute('required'));
+                document.querySelectorAll('#MedecinFields input').forEach(el => el.removeAttribute('required'));
+                document.querySelectorAll('#SecretaireFields input').forEach(el => el.removeAttribute('required'));
+
+                if (role === 'Patient') {
+                    ['PatientNom', 'PatientPrenom', 'PatientAdresse', 'PatientTelephone', 'PatientAntecedents'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.required = true;
+                    });
+                } else if (role === 'Medecin') {
+                    ['MedecinNom', 'MedecinPrenom', 'MedecinSpecialite', 'MedecinTelephone'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.required = true;
+                    });
+                } else if (role === 'Secretaire') {
+                    ['SecretaireNom', 'SecretairePrenom', 'SecretaireTelephone'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.required = true;
+                    });
                 }
             }
 
             roleSelect.addEventListener('change', toggleRoleFields);
-            toggleRoleFields(); // Initial check
+            toggleRoleFields();
         });
     </script>
 }

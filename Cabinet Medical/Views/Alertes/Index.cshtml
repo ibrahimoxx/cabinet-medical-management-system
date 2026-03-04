@@ -4,83 +4,94 @@
     ViewData["Title"] = "Mes Alertes";
 }
 
-<div class="card fade-in">
-    <div class="card-header">
-        <h4 class="mb-0">
-            <i class="bi bi-bell-fill me-2"></i>Mes Alertes
-        </h4>
-    </div>
-    <div class="card-body">
-        @if (Model.Any())
-        {
-            <div class="list-group">
-                @foreach (var alerte in Model)
-                {
-                    <div class="list-group-item @(alerte.EstLue ? "" : "border-start border-4 border-primary") mb-2 rounded">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="flex-grow-1">
-                                @if (!alerte.EstLue)
-                                {
-                                    <span class="badge bg-primary me-2">Nouveau</span>
-                                }
-                                <h6 class="mb-1">
-                                    @if (alerte.Type == "AnnulationRDV")
-                                    {
-                                        <i class="bi bi-x-circle-fill text-danger me-2"></i>
-                                    }
-                                    else if (alerte.Type == "RappelRDV")
-                                    {
-                                        <i class="bi bi-clock-fill text-warning me-2"></i>
-                                    }
-                                    @alerte.Type
-                                </h6>
-                                <p class="mb-1">@alerte.Message</p>
-                                <small class="text-muted">
-                                    <i class="bi bi-calendar3 me-1"></i>@alerte.DateCreation.ToString("dd/MM/yyyy HH:mm")
-                                </small>
-                            </div>
-                            @if (!alerte.EstLue)
-                            {
-                                <button class="btn btn-sm btn-outline-primary marquer-lue" data-id="@alerte.Id">
-                                    <i class="bi bi-check"></i> Marquer comme lue
-                                </button>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="text-center py-5">
-                <i class="bi bi-bell-slash" style="font-size: 4rem; color: #ccc;"></i>
-                <p class="text-muted mt-3">Aucune alerte.</p>
-            </div>
-        }
+<!-- Page Header -->
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Notifications & Alertes</h1>
+        <p>@Model.Count(a => !a.EstLue) alerte(s) non lue(s)</p>
     </div>
 </div>
+
+@if (Model.Any())
+{
+    <!-- Notifications feed (matches notification alerts reference) -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2 class="table-card-title">
+                <i class="fas fa-bell me-2" style="color:#1E88E5;"></i>Toutes les alertes
+            </h2>
+            <span class="badge badge-blue">@Model.Count(a => !a.EstLue) non lue(s)</span>
+        </div>
+        <div>
+            @foreach (var alerte in Model)
+            {
+                <div class="notif-item @(alerte.EstLue ? "" : "unread")">
+                    <!-- Icon -->
+                    <div class="notif-icon @(alerte.Type == "AnnulationRDV" ? "danger" : "warning")">
+                        @if (alerte.Type == "AnnulationRDV")
+                        { <i class="fas fa-times-circle"></i> }
+                        else
+                        { <i class="fas fa-clock"></i> }
+                    </div>
+                    <!-- Body -->
+                    <div class="notif-body">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            @if (!alerte.EstLue)
+                            {
+                                <span class="badge badge-blue" style="font-size:.6rem;">Nouveau</span>
+                            }
+                            <span class="notif-title">
+                                @(alerte.Type == "AnnulationRDV" ? "Annulation rendez-vous"
+                                  : alerte.Type == "RappelRDV" ? "Rappel rendez-vous"
+                                  : alerte.Type)
+                            </span>
+                        </div>
+                        <p class="notif-text">@alerte.Message</p>
+                        <span class="notif-time">
+                            <i class="fas fa-calendar" style="margin-right:4px;"></i>
+                            @alerte.DateCreation.ToString("dd/MM/yyyy HH:mm")
+                        </span>
+                    </div>
+                    <!-- Mark read -->
+                    @if (!alerte.EstLue)
+                    {
+                        <button class="btn btn-secondary btn-sm marquer-lue flex-shrink-0" data-id="@alerte.Id">
+                            <i class="fas fa-check"></i> Lu
+                        </button>
+                    }
+                    else
+                    {
+                        <i class="fas fa-check-double" style="color:#4CAF50;font-size:1.1rem;flex-shrink:0;"></i>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body" style="text-align:center;padding:64px 24px;">
+            <i class="fas fa-bell-slash" style="font-size:3rem;color:#E5E7EB;display:block;margin-bottom:16px;"></i>
+            <p style="color:#9CA3AF;font-size:.875rem;margin:0;">Aucune alerte pour le moment</p>
+        </div>
+    </div>
+}
 
 @section Scripts {
     <script>
         document.querySelectorAll('.marquer-lue').forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 const alerteId = parseInt(this.getAttribute('data-id'));
                 fetch('/Alertes/MarquerLue', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(alerteId)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    }
-                })
-                .catch(error => console.error('Erreur:', error));
+                .then(r => r.json())
+                .then(data => { if (data.success) location.reload(); })
+                .catch(err => console.error('Erreur:', err));
             });
         });
     </script>
 }
-

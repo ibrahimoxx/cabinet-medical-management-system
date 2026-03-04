@@ -2,83 +2,92 @@
     ViewData["Title"] = "Patient Dashboard";
 }
 
-<div class="row g-4 mb-4">
-    <div class="col-md-4">
-        <div class="stats-card primary fade-in">
-            <div class="icon">
-                <i class="bi bi-calendar-event-fill"></i>
-            </div>
-            <h3>@ViewBag.MesRDVProchains</h3>
-            <p>Rendez-vous à venir</p>
-        </div>
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="page-header-left">
+        <h1>Mon Espace Santé</h1>
+        <p>Bonjour @Context.Session.GetString("Username") — votre tableau de bord médical</p>
     </div>
-    <div class="col-md-4">
-        <div class="stats-card danger fade-in">
-            <div class="icon">
-                <i class="bi bi-receipt-cutoff"></i>
-            </div>
-            <h3>@ViewBag.MesFacturesEnAttente</h3>
-            <p>Factures en attente</p>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stats-card success fade-in">
-            <div class="icon">
-                <i class="bi bi-prescription2"></i>
-            </div>
-            <h3>@ViewBag.MesOrdonnances</h3>
-            <p>Ordonnances</p>
-        </div>
-    </div>
+    <a asp-controller="RendezVous" asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-calendar-plus me-2"></i>Prendre un RDV
+    </a>
 </div>
 
-<div class="row g-4">
-    <div class="col-md-6">
-        <div class="feature-card primary fade-in" onclick="window.location.href='@Url.Action("MesRendezVous", "RendezVous")'">
-            <div class="feature-icon">
-                <i class="bi bi-calendar-check-fill"></i>
+<!-- Quick Actions (2 large CTA cards) — patient_dashboard reference -->
+<div class="grid-2 mb-4">
+    <a asp-controller="RendezVous" asp-action="Create" class="quick-action-card">
+        <i class="fas fa-calendar-plus"></i>
+        <h2>Book an Appointment</h2>
+        <p>Schedule a consultation</p>
+    </a>
+    <a asp-controller="Ordonnances" asp-action="MesOrdonnances" class="quick-action-card">
+        <i class="fas fa-pills"></i>
+        <h2>View My Prescriptions</h2>
+        <p>Check medications</p>
+    </a>
+</div>
+
+<!-- Recent history + Next appointment + Financial -->
+<div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
+
+    <!-- Recent Medical History -->
+    <div class="card">
+        <div class="card-body">
+            <div class="card-header">
+                <h2 class="card-title">Historique Médical Récent</h2>
+                <a asp-controller="DossierMedicals" asp-action="MonDossier" style="font-size:.85rem;color:#1E88E5;font-weight:600;text-decoration:none;">Voir tout</a>
             </div>
-            <h5>Mes Rendez-vous</h5>
-            <p class="text-muted">Consulter vos rendez-vous planifiés</p>
-            <a asp-controller="RendezVous" asp-action="MesRendezVous" class="btn btn-primary mt-3">
-                <i class="bi bi-arrow-right me-2"></i>Accéder
-            </a>
+            <div style="display:flex;flex-direction:column;gap:12px;padding-top:8px;">
+                <!-- history items - will be populated from server; show placeholder if none -->
+                <div style="text-align:center;padding:24px 0;color:#9CA3AF;">
+                    <i class="fas fa-file-medical" style="font-size:2rem;color:#E3F2FD;"></i>
+                    <p class="mt-2 mb-3" style="font-size:.875rem;">Aucun historique récent disponible</p>
+                    <a asp-controller="DossierMedicals" asp-action="MonDossier" class="btn btn-primary btn-sm">
+                        <i class="fas fa-folder-open me-1"></i>Mon dossier médical
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="feature-card success fade-in" onclick="window.location.href='@Url.Action("MonDossier", "DossierMedicals")'">
-            <div class="feature-icon">
-                <i class="bi bi-file-earmark-medical"></i>
+
+    <!-- Right column: next appointment + financial -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Next Appointment card -->
+        <div class="card" style="overflow:hidden;">
+            <!-- Color bar at top -->
+            <div style="height:4px;background:linear-gradient(90deg,#3B82F6,#8B5CF6);"></div>
+            <div class="card-body">
+                <div class="card-header">
+                    <h2 class="card-title">Prochain RDV</h2>
+                    <div style="background:#EFF6FF;color:#3B82F6;padding:6px 8px;border-radius:8px;font-size:.875rem;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+                <div style="text-align:center;padding:16px 0;color:#9CA3AF;">
+                    <i class="fas fa-calendar-times" style="font-size:1.5rem;color:#E3F2FD;"></i>
+                    <p class="mt-2 mb-3" style="font-size:.875rem;">Aucun RDV à venir</p>
+                    <a asp-controller="RendezVous" asp-action="Create" class="btn btn-primary btn-sm">
+                        <i class="fas fa-calendar-plus me-1"></i>Prendre un RDV
+                    </a>
+                </div>
             </div>
-            <h5>Mon Dossier Médical</h5>
-            <p class="text-muted">Consulter votre dossier médical et historique</p>
-            <a asp-controller="DossierMedicals" asp-action="MonDossier" class="btn btn-success mt-3">
-                <i class="bi bi-arrow-right me-2"></i>Accéder
-            </a>
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="feature-card warning fade-in" onclick="window.location.href='@Url.Action("MesFactures", "Factures")'">
-            <div class="feature-icon">
-                <i class="bi bi-receipt"></i>
+
+        <!-- Financial Summary -->
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Résumé Financier</h2>
+                <p style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6B7280;margin-bottom:4px;">Factures en attente</p>
+                <p style="font-size:2rem;font-weight:700;color:#1F2937;margin-bottom:16px;">
+                    @(ViewBag.MesFacturesEnAttente > 0 ? ViewBag.MesFacturesEnAttente + " facture(s)" : "Aucune")
+                </p>
+                <a asp-controller="Factures" asp-action="MesFactures" class="btn btn-sm w-100"
+                   style="background:#22C55E;color:#fff;border:none;">
+                    <i class="fas fa-credit-card me-1"></i>Voir mes factures
+                </a>
             </div>
-            <h5>Mes Factures</h5>
-            <p class="text-muted">Consulter et payer vos factures</p>
-            <a asp-controller="Factures" asp-action="MesFactures" class="btn btn-warning mt-3">
-                <i class="bi bi-arrow-right me-2"></i>Accéder
-            </a>
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="feature-card info fade-in" onclick="window.location.href='@Url.Action("MesOrdonnances", "Ordonnances")'">
-            <div class="feature-icon">
-                <i class="bi bi-prescription2"></i>
-            </div>
-            <h5>Mes Ordonnances</h5>
-            <p class="text-muted">Consulter vos ordonnances médicales</p>
-            <a asp-controller="Ordonnances" asp-action="MesOrdonnances" class="btn btn-info mt-3">
-                <i class="bi bi-arrow-right me-2"></i>Accéder
-            </a>
-        </div>
+
     </div>
 </div>

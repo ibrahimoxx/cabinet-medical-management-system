@@ -2,78 +2,174 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="stats-card primary fade-in">
-            <div class="icon">
-                <i class="bi bi-people-fill"></i>
-            </div>
+<!-- Page Header (matches admin_dashboard reference) -->
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <div style="width:40px;height:40px;background:#E3F2FD;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-user" style="color:#1E88E5;"></i>
+        </div>
+        <div>
+            <h1 class="mb-0" style="font-size:1.5rem;font-weight:700;color:#1F2937;">Admin Dashboard</h1>
+            <p class="mb-0" style="font-size:0.875rem;color:#6B7280;">Welcome back, Administrator</p>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Grid (4 cards, horizontal icon+data layout — matches admin_dashboard) -->
+<div class="stats-grid mb-4">
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+            <p>Total Users</p>
             <h3>@ViewBag.TotalUsers</h3>
-            <p>Total Utilisateurs</p>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="stats-card success fade-in">
-            <div class="icon">
-                <i class="bi bi-check-circle-fill"></i>
-            </div>
-            <h3>@ViewBag.ActiveUsers</h3>
-            <p>Utilisateurs Actifs</p>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-user-md"></i>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card warning fade-in">
-            <div class="icon">
-                <i class="bi bi-person-heart"></i>
-            </div>
-            <h3>@ViewBag.TotalPatients</h3>
-            <p>Patients</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stats-card danger fade-in">
-            <div class="icon">
-                <i class="bi bi-heart-pulse-fill"></i>
-            </div>
+        <div class="stat-info">
+            <p>Active Doctors</p>
             <h3>@ViewBag.TotalMedecins</h3>
-            <p>Médecins</p>
         </div>
     </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-keyboard"></i>
+        </div>
+        <div class="stat-info">
+            <p>Active Secretaries</p>
+            <h3>@ViewBag.TotalSecretaires</h3>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#E8F5E9;color:#4CAF50;">
+            <i class="fas fa-heartbeat"></i>
+        </div>
+        <div class="stat-info">
+            <p>Total Patients</p>
+            <h3>@ViewBag.TotalPatients</h3>
+        </div>
+    </div>
+
 </div>
 
-<div class="card fade-in">
-    <div class="card-header">
-        <h4 class="mb-0">
-            <i class="bi bi-gear-fill me-2"></i>Administration
-        </h4>
-    </div>
-    <div class="card-body">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="feature-card primary" onclick="window.location.href='@Url.Action("Index", "Users")'">
-                    <div class="feature-icon">
-                        <i class="bi bi-people-fill"></i>
+<!-- Bottom: Role chart card (1 col) + Recent Activity table (2 col) -->
+<div class="bottom-grid">
+
+    <!-- Chart card -->
+    <div class="card">
+        <div class="card-body">
+            <div class="card-header">
+                <h2 class="card-title">User Distribution by Role</h2>
+                <button class="btn-tbl-action"><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+
+            <!-- Simple visual distribution bars -->
+            <div class="mt-2">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#1E88E5;display:inline-block;"></span>
+                            <span style="font-size:.8rem;color:#6B7280;">Médecins</span>
+                        </div>
+                        <span style="font-size:.85rem;font-weight:700;color:#1F2937;">@ViewBag.TotalMedecins</span>
                     </div>
-                    <h5>Gestion des Utilisateurs</h5>
-                    <p class="text-muted">Consulter, ajouter, modifier et supprimer des utilisateurs</p>
-                    <a asp-controller="Users" asp-action="Index" class="btn btn-primary mt-3">
-                        <i class="bi bi-arrow-right me-2"></i>Accéder
-                    </a>
+                    <div style="height:6px;background:#F3F4F6;border-radius:9999px;overflow:hidden;">
+                        <div style="height:100%;background:#1E88E5;width:15%;border-radius:9999px;"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#4FC3F7;display:inline-block;"></span>
+                            <span style="font-size:.8rem;color:#6B7280;">Secrétaires</span>
+                        </div>
+                        <span style="font-size:.85rem;font-weight:700;color:#1F2937;">@ViewBag.TotalSecretaires</span>
+                    </div>
+                    <div style="height:6px;background:#F3F4F6;border-radius:9999px;overflow:hidden;">
+                        <div style="height:100%;background:#4FC3F7;width:10%;border-radius:9999px;"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#B0BEC5;display:inline-block;"></span>
+                            <span style="font-size:.8rem;color:#6B7280;">Patients</span>
+                        </div>
+                        <span style="font-size:.85rem;font-weight:700;color:#1F2937;">@ViewBag.TotalPatients</span>
+                    </div>
+                    <div style="height:6px;background:#F3F4F6;border-radius:9999px;overflow:hidden;">
+                        <div style="height:100%;background:#B0BEC5;width:75%;border-radius:9999px;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:10px;height:10px;border-radius:50%;background:#FFA726;display:inline-block;"></span>
+                            <span style="font-size:.8rem;color:#6B7280;">Actifs</span>
+                        </div>
+                        <span style="font-size:.85rem;font-weight:700;color:#1F2937;">@ViewBag.ActiveUsers</span>
+                    </div>
+                    <div style="height:6px;background:#F3F4F6;border-radius:9999px;overflow:hidden;">
+                        <div style="height:100%;background:#FFA726;width:@(ViewBag.TotalUsers > 0 ? (int)(((double)(ViewBag.ActiveUsers ?? 0) / (double)(ViewBag.TotalUsers ?? 1)) * 100) : 0)%;border-radius:9999px;"></div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="feature-card info" onclick="window.location.href='@Url.Action("Index", "Profile")'">
-                    <div class="feature-icon">
-                        <i class="bi bi-person-circle"></i>
-                    </div>
-                    <h5>Mon Profil</h5>
-                    <p class="text-muted">Modifier vos informations personnelles</p>
-                    <a asp-controller="Profile" asp-action="Index" class="btn btn-info mt-3">
-                        <i class="bi bi-arrow-right me-2"></i>Accéder
-                    </a>
-                </div>
+
+            <!-- Quick nav -->
+            <div class="mt-4 pt-3" style="border-top:1px solid #F3F4F6;">
+                <a asp-controller="Users" asp-action="Index" class="btn btn-primary btn-sm w-100">
+                    <i class="fas fa-users me-2"></i>Gérer les utilisateurs
+                </a>
             </div>
         </div>
     </div>
-</div>
 
+    <!-- Recent Activity table -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h2 class="table-card-title">Recent System Activity</h2>
+            <a asp-controller="Users" asp-action="Index" style="font-size:.85rem;color:#1E88E5;font-weight:600;text-decoration:none;">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date/Heure</th>
+                        <th>Utilisateur</th>
+                        <th>Action</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color:#6B7280;font-size:.8rem;white-space:nowrap;">Aujourd'hui 09:30</td>
+                        <td style="font-weight:600;">Administrateur</td>
+                        <td>Connexion au système</td>
+                        <td><span class="status-complete">Complet</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:#6B7280;font-size:.8rem;white-space:nowrap;">Aujourd'hui 09:00</td>
+                        <td style="font-weight:600;">Système</td>
+                        <td>Démarrage serveur</td>
+                        <td><span class="status-complete">Complet</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color:#6B7280;font-size:.8rem;white-space:nowrap;">-</td>
+                        <td style="color:#9CA3AF;">-</td>
+                        <td style="color:#9CA3AF;">Aucune activité récente</td>
+                        <td><span class="status-pending">-</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
